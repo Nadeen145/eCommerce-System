@@ -1,9 +1,13 @@
-import React, { useState } from 'react';
-import './../AdminsPanel.css';
-import { Header } from '../../../AppHeader/Header';
-import { PageLayout } from './../../../Pages/PageLayout';
-import { pages, Pages } from '../../../../Constants';
-import { BackofficeNavbar } from '../BackofficeNavebar';
+import React, { useEffect, useState } from 'react';
+import './AdminsPanel.css';
+import { Header } from '../../AppHeader/Header';
+import { PageLayout } from '../PageLayout';
+import { pages, Pages } from '../../../Constants';
+import { BackofficeNavbar } from './BackofficeNavebar';
+import axios from 'axios';
+import { Loading } from '../../Common/Loading';
+
+let url_product = `http://localhost:3001/products/`;
 
 export interface TeamTaubBackoffice2Props {
   changePage(newPage: Pages): void,
@@ -13,13 +17,15 @@ export const TeamTaubBackoffice2: React.FC<TeamTaubBackoffice2Props> = ({
   changePage,  
 }) => {  
 
+    const [loading, setLoading] = useState(false);
+    const [buttonText, setButtonText] = useState('Add Product!');
 
     const [name, setName] = useState({value:'', error:true, errorDetail:''});
     const [category, setCategory] = useState({value:'', error:true, errorDetail:''});
     const [description, setDescription] = useState({value:'', error:true, errorDetail:''});
     const [price, setPrice] = useState({value:'', error:true, errorDetail:''});
     const [stock, setStock] = useState({value:'', error:true, errorDetail:''});
-    const [imgUrl, setImgUrl] = useState({value:'', error:true, errorDetail:''});
+    const [imgUrl, setImgUrl] = useState({value:'', error:false, errorDetail:''});
   
     const handleName = (event:any) => {
       let data = event.target.value;
@@ -138,7 +144,7 @@ export const TeamTaubBackoffice2: React.FC<TeamTaubBackoffice2Props> = ({
         if(data === ''){
           setImgUrl({
             value: data,
-            error: true,
+            error: false,
             errorDetail: 'Image URL cannot be empty!'});
             return;
         }
@@ -156,17 +162,146 @@ export const TeamTaubBackoffice2: React.FC<TeamTaubBackoffice2Props> = ({
           || price.error == true
           || stock.error == true
           || imgUrl.error == true){
+
+            if(name.error && name.value === ""){
+              setName({
+                value: name.value,
+                error: true,
+                errorDetail: 'Name cannot be empty!'});
+            }
+            if(category.error && category.value === ""){
+              setCategory({
+                value: category.value,
+                error: true,
+                errorDetail: 'Category cannot be empty!'});
+            }
+            if(description.error && description.value === ""){
+              setDescription({
+                value: description.value,
+                error: true,
+                errorDetail: 'Description cannot be empty!'});
+            }
+            if(price.error && price.value === ""){
+              setPrice({
+                value: price.value,
+                error: true,
+                errorDetail: 'Price cannot be empty!'});
+            }
+            if(stock.error && stock.value === ""){
+              setStock({
+                value: stock.value,
+                error: true,
+                errorDetail: 'Stock cannot be empty!'});
+            }
+            
             return;
         }
-        return changePage(Pages.TeamTaubBackoffice1);
+
+        if(localStorage.getItem('product') === ''){
+          addProduct();
+        } else{
+          updateProduct();
+        }
+
       }
+
+      const addProduct = async() => {
+        try{
+          const response = await axios.post(
+            url_product,
+            {
+              name: name.value,
+              category: category.value,
+              description: description.value,
+              price: parseInt(price.value),
+              stock: parseInt(stock.value),
+              image: imgUrl.value
+            },
+            { withCredentials: true }
+          );
+
+          localStorage.clear();
+          if(response.status === 200){
+            setLoading(false);
+          }
+        } catch{
+          setLoading(false);
+        }
+        setLoading(false);
+        changePage(Pages.TeamTaubBackoffice1);
+      }
+
+      const updateProduct = async() => {
+        let id = localStorage.getItem('product');
+        
+        try{
+          const response = await axios.put(
+            url_product+id,
+            {
+              name: name.value,
+              category: category.value,
+              description: description.value,
+              price: parseInt(price.value),
+              stock: parseInt(stock.value),
+              image: imgUrl.value
+            },
+            { withCredentials: true }
+          );
+
+          localStorage.clear();
+
+          if(response.status === 200){
+            setLoading(false);
+          }
+        } catch{
+          setLoading(false);
+        }
+        setLoading(false);
+        changePage(Pages.TeamTaubBackoffice1);
+      }
+
+      const fetchData = async() => {
+        setLoading(true);
+
+        if(localStorage.getItem('product') === ''){
+          setLoading(false);
+          return;
+        }
+        setButtonText('Update Product!')
+
+        try{
+          const response = await axios.get(
+            url_product+localStorage.getItem('product'),
+            { withCredentials: true }
+          );
+  
+          if(response.status === 200){
+            let data = response.data;
+            setName({value: data['name'], error:false, errorDetail:''})
+            setCategory({value: data['category'], error:false, errorDetail:''})
+            setDescription({value: data['description'], error:false, errorDetail:''})
+            setPrice({value: data['price'], error:false, errorDetail:''})
+            setStock({value: data['stock'], error:false, errorDetail:''})
+            setImgUrl({value: data['image']? data['image']:'', error:false, errorDetail:''})
+
+            setLoading(false);
+          }
+        } catch{
+          setLoading(false);
+        }
+
+        setLoading(false);
+      }
+  
+      useEffect(() => {
+        fetchData();
+      }, []);
 
     return (
         <div className="root">
             <Header 
                 changePage={changePage} 
                 title={pages[Pages.TeamTaubBackoffice1]}
-                isUserInterface={false}  
             />
   
             <BackofficeNavbar changePage={changePage} isProductsButton={true} />
@@ -175,6 +310,13 @@ export const TeamTaubBackoffice2: React.FC<TeamTaubBackoffice2Props> = ({
                 <span>New Product | Update Product</span>
             </div>
 
+            {
+        loading?
+        <div className='margin-top-container'>
+          <Loading /> 
+        </div>
+            :
+        <div>
 
             <div>
                 <form>
@@ -191,7 +333,7 @@ export const TeamTaubBackoffice2: React.FC<TeamTaubBackoffice2Props> = ({
                           value={name.value}
                         />
                       </div>
-                      {name.error && <p className='error-backoffice'>{name.errorDetail}</p>}
+                      {name.error && <p className='error error-backoffice'>{name.errorDetail}</p>}
 
                       <div className='row-input'>
                         <span className='align-regular-text'>Category: </span>
@@ -204,7 +346,7 @@ export const TeamTaubBackoffice2: React.FC<TeamTaubBackoffice2Props> = ({
                           value={category.value}
                         />
                       </div>
-                      {category.error && <p className='error-backoffice'>{category.errorDetail}</p>}
+                      {category.error && <p className='error error-backoffice'>{category.errorDetail}</p>}
 
                       <div className='row-input'>
                         <span className='align-regular-text'>Description: </span>
@@ -217,7 +359,7 @@ export const TeamTaubBackoffice2: React.FC<TeamTaubBackoffice2Props> = ({
                           value={description.value}
                         />
                       </div>
-                      {description.error && <p className='error-backoffice'>{description.errorDetail}</p>}
+                      {description.error && <p className='error error-backoffice'>{description.errorDetail}</p>}
 
                       <div className='row-input'>
                         <span className='align-regular-text'>Price: </span>
@@ -230,7 +372,7 @@ export const TeamTaubBackoffice2: React.FC<TeamTaubBackoffice2Props> = ({
                           value={price.value}
                         />
                       </div>
-                      {price.error && <p className='error-backoffice'>{price.errorDetail}</p>}
+                      {price.error && <p className='error error-backoffice'>{price.errorDetail}</p>}
 
                       <div className='row-input'>
                         <span className='align-regular-text'>Stock: </span>
@@ -243,7 +385,7 @@ export const TeamTaubBackoffice2: React.FC<TeamTaubBackoffice2Props> = ({
                           value={stock.value}
                         />
                       </div>
-                      {stock.error && <p className='error-backoffice'>{stock.errorDetail}</p>}
+                      {stock.error && <p className='error error-backoffice'>{stock.errorDetail}</p>}
 
                       <div className='row-input'>
                         <span className='align-regular-text'>Image URL: </span>
@@ -256,18 +398,22 @@ export const TeamTaubBackoffice2: React.FC<TeamTaubBackoffice2Props> = ({
                           value={imgUrl.value}
                         />
                       </div>
-                      {imgUrl.error && <p className='error-backoffice'>{imgUrl.errorDetail}</p>}
+                      {imgUrl.error && <p className='error error-backoffice'>{imgUrl.errorDetail}</p>}
 
                     </div>
 
                     <div className='center'>
-                        <button className="btn add-button" onClick={()=>validInputs()}>
-                            Add Product
+                        <button type='button' className="btn add-button" onClick={()=>validInputs()}>
+                            {buttonText}
                         </button>
                     </div>
                     
                 </form>
             </div>
+
+              </div>
+          }
+
         </div>
       );
 }

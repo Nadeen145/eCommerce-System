@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import './../UserInterface.css';
-import { Header } from '../../../AppHeader/Header';
-import { PageLayout } from './../../../Pages/PageLayout';
-import { pages, Pages } from '../../../../Constants';
+import './UserInterface.css';
+import { Header } from '../../AppHeader/Header';
+import { PageLayout } from '../PageLayout';
+import { pages, Pages } from '../../../Constants';
 
 export interface CheckoutProps {
   changePage(newPage: Pages): void,
@@ -266,7 +266,6 @@ export const Checkout: React.FC<CheckoutProps> = ({
           <Header 
             changePage={changePage} 
             title={pages[Pages.Checkout]}
-            isUserInterface={true}  
           />
 
           <button className='btn back-button' onClick={() => changePage(Pages.Cart)}>

@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import './App.css';
 import "bootstrap/dist/css/bootstrap.min.css"
 import { Header } from './components/AppHeader/Header';
 import { PageLayout } from './components/Pages/PageLayout';
 import { Pages } from './Constants';
+import axios from 'axios';
 
 function App() {
 

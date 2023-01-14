@@ -1,12 +1,12 @@
 import React, {useState} from 'react';
-import { Pages } from '../../../../Constants';
-import '../Auth.css';
+import { Pages } from '../../../Constants';
+import './Auth.css';
 
-export interface SignupProps {
+export interface ResetPasswordProps {
     changePage(newPage: Pages): void,
   }
   
-  export const Signup: React.FC<SignupProps> = ({
+  export const ResetPassword: React.FC<ResetPasswordProps> = ({
     changePage,  
   }) => {
 
@@ -75,21 +75,21 @@ export interface SignupProps {
         }
     };
 
-    const checkUserValidate = () => {
+    const changeUserPassword = () => {
         if(username.error == true 
             || password.error == true 
             || confirmPassword.error == true){
             return;
         }
-
+        
         //TODO: backend
-        changePage(Pages.TeamTaubBackoffice1);
+        changePage(Pages.Catalog);
       }    
 
     return (
       <div>
         <div>
-            <h3 className="Auth-form-title">Sign Up</h3>
+            <h3 className="Auth-form-title">Reset Password</h3>
         </div>
         <div className="Auth-form-container">
             <form className="Auth-form">
@@ -134,7 +134,7 @@ export interface SignupProps {
                 
                 </div>
                 <div className="d-grid gap-2 mt-3">
-                <button type="submit" className="btn btn-signup" onClick={()=>checkUserValidate()}>
+                <button type="submit" className="btn btn-signup" onClick={()=>changeUserPassword()}>
                     Submit
                 </button>
                 </div>

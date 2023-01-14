@@ -1,17 +1,17 @@
 import React from 'react';
 import '../../App.css';
 import { Pages } from '../../Constants';
-import { TeamTaubBackoffice1 } from './AdminsPanel/TeamTaubBackoffice1Page/TeamTaubBackoffice1';
-import { TeamTaubBackoffice2 } from './AdminsPanel/TeamTaubBackoffice2Page/TeamTaubBackoffice2';
-import { TeamTaubBackoffice3 } from './AdminsPanel/TeamTaubBackoffice3Page/TeamTaubBackoffice3';
-import { Login } from './AuthPages/LoginPage/Login';
-import { ResetPassword } from './AuthPages/ResetPasswordPage/ResetPassword';
-import { Signup } from './AuthPages/SignupPage/Signup';
-import { Cart } from './UserInterfacePages/CartPage/Cart';
-import { Catalog } from './UserInterfacePages/CatalogPage/Catalog';
-import { Checkout } from './UserInterfacePages/CheckoutPage/Checkout';
-import { Product } from './UserInterfacePages/ProductPage/Product';
-import { ThankYou } from './UserInterfacePages/ThankYouPage/ThankYou';
+import { TeamTaubBackoffice1 } from './AdminsPanel/TeamTaubBackoffice1';
+import { TeamTaubBackoffice2 } from './AdminsPanel/TeamTaubBackoffice2';
+import { TeamTaubBackoffice3 } from './AdminsPanel/TeamTaubBackoffice3';
+import { Login } from './AuthPages/Login';
+import { ResetPassword } from './AuthPages/ResetPassword';
+import { Signup } from './AuthPages/Signup';
+import { Cart } from './UserInterfacePages/Cart';
+import { Catalog } from './UserInterfacePages/Catalog';
+import { Checkout } from './UserInterfacePages/Checkout';
+import { Product } from './UserInterfacePages/Product';
+import { ThankYou } from './UserInterfacePages/ThankYou';
 
 export interface PageLayoutProps {
     page: Pages;

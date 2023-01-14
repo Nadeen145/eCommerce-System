@@ -5,20 +5,18 @@ import { Navbar } from './Navbar';
 export interface HeaderProps {
     changePage(newPage: number): void;
     title: String;
-    isUserInterface: boolean;
 }
 export const Header: React.FC<HeaderProps> = ({
     changePage,
     title,
-    isUserInterface
 }) => {
     return (
-        isUserInterface?
+        localStorage.getItem('permission') === 'U'?
         <div>
             <div className='header-container-user-interface'>
                 <h1 className='app-header'> {title} </h1>
                 <div className='space container-user-interface'>
-                    <Navbar changePage={changePage} isUserInterface={isUserInterface} />
+                    <Navbar changePage={changePage} />
                     <div className='user-circle'>〇</div>
                 </div>
             </div>
@@ -28,7 +26,7 @@ export const Header: React.FC<HeaderProps> = ({
             <div className='header-container-backoffice'>
                 <h1 className='app-header'> {title} </h1>
                 <div className='space container-backoffice'>
-                    <Navbar changePage={changePage} isUserInterface={isUserInterface} />
+                    <Navbar changePage={changePage} />
                     <div className='user-circle'>〇</div>
                 </div>
             </div>
