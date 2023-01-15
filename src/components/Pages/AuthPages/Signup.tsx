@@ -14,12 +14,22 @@ export interface SignupProps {
     changePage,  
   }) => {
 
+    let questions = [
+      '▼ What is your favorite pet?',
+      '▼ What is your favorite food?',
+      '▼ What is your favorite color?',
+      '▼ What is the name of your first pet?',
+      '▼ What is your favorite drink?',
+      '▼ What is your favorite movie?',
+      '▼ What is your habbit?'
+    ];
+
     const [loading, setLoading] = useState(false);
 
     const [username, setUsername] = useState({value:'', error:true, errorDetail:''});
     const [password, setPassword] = useState({value:'', error:true, errorDetail:''});
     const [confirmPassword, setConfirmPassword] = useState({value:'', error:true, errorDetail:''});
-    const [question, setQuestion] = useState({value:'', error:true, errorDetail:''});
+    const [secureQuestion, setSecureQuestion] = useState(questions[0]);
     const [answer, setAnswer] = useState({value:'', error:true, errorDetail:''});
 
     const handleUsernameChange = (event:any) => {
@@ -44,7 +54,7 @@ export interface SignupProps {
           setPassword({
             value: data,
             error: true,
-            errorDetail: 'Name cannot be empty!'});
+            errorDetail: 'Password cannot be empty!'});
             return;
         }
 
@@ -83,20 +93,8 @@ export interface SignupProps {
         }
     };
 
-    const handleQuestion = (event:any) => {
-        let data = event.target.value;
-        if(data === ''){
-          setQuestion({
-            value: data,
-            error: true,
-            errorDetail: 'Question cannot be empty!'});
-            return;
-        }
-    
-        setQuestion({
-          value: data,
-          error: false,
-          errorDetail: ''});
+    const handleSecureQuestion = (event:any) => {
+        setSecureQuestion(event.target.value);
     };
     const handleAnswer = (event:any) => {
         let data = event.target.value;
@@ -122,7 +120,6 @@ export interface SignupProps {
         if(username.error === true 
             || password.error === true 
             || confirmPassword.error === true
-            || question.error === true
             || answer.error === true){
 
                 if(username.error && username.value === ""){
@@ -143,12 +140,6 @@ export interface SignupProps {
                       error: true,
                       errorDetail: 'Confirm password cannot be empty!'});
                   }
-                  if(question.error && question.value === ""){
-                    setQuestion({
-                      value: question.value,
-                      error: true,
-                      errorDetail: 'Question cannot be empty!'});
-                  }
                   if(answer.error && answer.value === ""){
                     setAnswer({
                       value: answer.value,
@@ -165,7 +156,7 @@ export interface SignupProps {
             {
               username: username.value,
               password: password.value,
-              question: question.value,
+              question: secureQuestion,
               answer: answer.value,
             }, { withCredentials: true }
           );
@@ -241,17 +232,15 @@ export interface SignupProps {
                 {confirmPassword.error && <p className='error'>{confirmPassword.errorDetail}</p>}
 
                 <div className="form-group mt-3">
-                <label>Question</label>
-                <input
-                    type="text"
-                    required
-                    className="form-control mt-1"
-                    placeholder="Password"
-                    onChange={handleQuestion}
-                    value={question.value}
-                />
+                  <label>Secure Question</label>
+                  <select className="form-control mt-1" value={secureQuestion} onChange={handleSecureQuestion}>
+                    {questions.map((question) => (
+                      <option>
+                        {question}
+                      </option>
+                    ))}
+                  </select>
                 </div>
-                {question.error && <p className='error'>{question.errorDetail}</p>}
 
                 <div className="form-group mt-3">
                 <label>Answer</label>
@@ -259,7 +248,7 @@ export interface SignupProps {
                     type="text"
                     required
                     className="form-control mt-1"
-                    placeholder="Confirm Password"
+                    placeholder="Answer"
                     onChange={handleAnswer}
                     value={answer.value}
                 />

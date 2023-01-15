@@ -12,7 +12,6 @@ export const Navbar: React.FC<NavbarProps> = ({
     changePage,
 }) => {
 
-    let list = ['Admin', 'Cart'];
     const [isUserInterface, setIsUserInterface] = useState(true);
 
     const logout = async() => {

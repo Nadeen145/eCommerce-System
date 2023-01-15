@@ -1,6 +1,10 @@
+import axios from 'axios';
 import React, {useState} from 'react';
 import { Pages } from '../../../Constants';
+import { Loading } from '../../Common/Loading';
 import './Auth.css';
+
+let url_user = `http://localhost:3001/users/`;
 
 export interface ResetPasswordProps {
     changePage(newPage: Pages): void,
@@ -10,9 +14,22 @@ export interface ResetPasswordProps {
     changePage,  
   }) => {
 
+    let questions = [
+        '▼ What is your favorite pet?',
+        '▼ What is your favorite food?',
+        '▼ What is your favorite color?',
+        '▼ What is the name of your first pet?',
+        '▼ What is your favorite drink?',
+        '▼ What is your favorite movie?',
+        '▼ What is your habbit?'
+      ];
+
+    const [loading, setLoading] = useState(false);
+
     const [username, setUsername] = useState({value:'', error:true, errorDetail:''});
-    const [password, setPassword] = useState({value:'', error:true, errorDetail:''});
-    const [confirmPassword, setConfirmPassword] = useState({value:'', error:true, errorDetail:''});
+    const [secureQuestion, setSecureQuestion] = useState(questions[0]);
+    const [answer, setAnswer] = useState({value:'', error:true, errorDetail:''});
+    const [newPassword, setNewPassword] = useState({value:'', error:true, errorDetail:''});
 
     const handleUsernameChange = (event:any) => {
         let data = event.target.value;
@@ -30,123 +47,151 @@ export interface ResetPasswordProps {
           errorDetail: ''});
     };
   
-    const handlePasswordChange = (event:any) => {
+    const handleSecureQuestion = (event:any) => {
+        setSecureQuestion(event.target.value);
+    };
+    const handleAnswer = (event:any) => {
         let data = event.target.value;
         if(data === ''){
-          setPassword({
+          setAnswer({
             value: data,
             error: true,
-            errorDetail: 'Name cannot be empty!'});
+            errorDetail: 'Answer cannot be empty!'});
+            return;
+        }
+    
+        setAnswer({
+          value: data,
+          error: false,
+          errorDetail: ''});
+    };
+
+    const handleNewPasswordChange = (event:any) => {
+        let data = event.target.value;
+        if(data === ''){
+          setNewPassword({
+            value: data,
+            error: true,
+            errorDetail: 'New Password cannot be empty!'});
             return;
         }
 
-        if(data !== confirmPassword.value){
-            setConfirmPassword({
-                value: confirmPassword.value,
-                error: true,
-                errorDetail: 'Password and Confirm Password does not match!'
-            })
-        } else{
-            setConfirmPassword({
-                value: confirmPassword.value,
-                error: false,
-                errorDetail: ''
-            });
-        }
-
-        setPassword({
+        setNewPassword({
             value: data,
             error: false,
             errorDetail: ''});
     };
-    const handleConfirmPasswordChange = (event: any) => {
-        if(password.value !== event.target.value){
-            setConfirmPassword({
-                value: event.target.value,
-                error: true,
-                errorDetail: 'Password and Confirm Password does not match!'
-            })
-        } else{
-            setConfirmPassword({
-                value: event.target.value,
-                error: false,
-                errorDetail: ''
-            })
-        }
-    };
 
-    const changeUserPassword = () => {
-        if(username.error == true 
-            || password.error == true 
-            || confirmPassword.error == true){
-            return;
+    const changeUserPassword = async(event:any) => {
+        event.preventDefault();
+        setLoading(true);
+
+        try{
+            if(username.error == true || answer.error == true){
+                setLoading(false);
+                return;
+            }
+
+        const response = await axios.put(
+            url_user+'updatepassword/'+username.value,
+            {
+              password: newPassword.value,
+              question: secureQuestion,
+              answer: answer.value,
+            }, { withCredentials: true }
+          );
+
+          if(response.status === 200){
+            changePage(Pages.Login);
+          }
+
+          setLoading(false);
+        } catch{
+          setLoading(false);
         }
-        
-        //TODO: backend
-        changePage(Pages.Catalog);
       }    
 
-    return (
-      <div>
+      return (
         <div>
-            <h3 className="Auth-form-title">Reset Password</h3>
-        </div>
-        <div className="Auth-form-container">
-            <form className="Auth-form">
-            <div className="Auth-form-content">
-                <div className="form-group mt-3">
-                <label>Username</label>
-                <input
-                    type="text"
-                    required
-                    className="form-control mt-1"
-                    placeholder="e.g TomS"
-                    onChange={handleUsernameChange}
-                    value={username.value}
-                />
-                </div>
-                {username.error && <p className='error'>{username.errorDetail}</p>}
-
-                <div className="form-group mt-3">
-                <label>Password</label>
-                <input
-                    type="password"
-                    required
-                    className="form-control mt-1"
-                    placeholder="Password"
-                    onChange={handlePasswordChange}
-                    value={password.value}
-                />
-                </div>
-                {password.error && <p className='error'>{password.errorDetail}</p>}
-
-                <div className="form-group mt-3">
-                <label>Confirm Password</label>
-                <input
-                    type="password"
-                    required
-                    className="form-control mt-1"
-                    placeholder="Confirm Password"
-                    onChange={handleConfirmPasswordChange}
-                    value={confirmPassword.value}
-                />
-                {confirmPassword.error && <p className='error'>{confirmPassword.errorDetail}</p>}
-                
-                </div>
-                <div className="d-grid gap-2 mt-3">
-                <button type="submit" className="btn btn-signup" onClick={()=>changeUserPassword()}>
-                    Submit
-                </button>
-                </div>
-                <p>
-                Forgot Password? <a href="#" onClick={()=>changePage(Pages.ResetPassword)}>Reset</a>
-                </p>
-                <p>
-                Already registered? <a href="#" onClick={()=>changePage(Pages.Login)}>Sign In</a>
-                </p>
+          {loading? 
+            <div className='margin-top-container'>
+                <Loading />
             </div>
-            </form>
+          :
+          <div>
+          <div>
+              <h3 className="Auth-form-title">Reset Password</h3>
+          </div>
+          <div className="Auth-form-container">
+              <form className="Auth-form">
+              <div className="Auth-form-content">
+                  <div className="form-group mt-3">
+                  <label>Username</label>
+                  <input
+                      type="text"
+                      required
+                      className="form-control mt-1"
+                      placeholder="e.g TomS"
+                      onChange={handleUsernameChange}
+                      value={username.value}
+                  />
+                  </div>
+                  {username.error && <p className='error'>{username.errorDetail}</p>}
+  
+                  <div className="form-group mt-3">
+                    <label>Secure Question</label>
+                    <select className="form-control mt-1" value={secureQuestion} onChange={handleSecureQuestion}>
+                      {questions.map((question) => (
+                        <option>
+                          {question}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+  
+                  <div className="form-group mt-3">
+                  <label>Answer</label>
+                  <input
+                      type="text"
+                      required
+                      className="form-control mt-1"
+                      placeholder="Answer"
+                      onChange={handleAnswer}
+                      value={answer.value}
+                  />
+                  </div>
+                  {answer.error && <p className='error'>{answer.errorDetail}</p>}
+
+                    <div className="form-group mt-3">
+                    <label>New Password</label>
+                    <input
+                        type="password"
+                        required
+                        className="form-control mt-1"
+                        placeholder="New Password"
+                        onChange={handleNewPasswordChange}
+                        value={newPassword.value}
+                    />
+                    </div>
+                    {newPassword.error && <p className='error'>{newPassword.errorDetail}</p>}
+  
+  
+                  <div className="d-grid gap-2 mt-3">
+                  <button type="submit" className="btn btn-signup" onClick={(event)=>changeUserPassword(event)}>
+                      Submit
+                  </button>
+                  </div>
+                  <p>
+                  Remembered your password? <a href="#" onClick={()=>changePage(Pages.Login)}>Sign In</a>
+                  </p>
+                  <p>
+                  Not registered? <a href="#" onClick={()=>changePage(Pages.Signup)}>Sign Up</a>
+                  </p>
+              </div>
+              </form>
+          </div>
+          </div>
+          }
         </div>
-      </div>
-    )
+      )
 }

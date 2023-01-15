@@ -10,6 +10,7 @@ import { Signup } from './AuthPages/Signup';
 import { Cart } from './UserInterfacePages/Cart';
 import { Catalog } from './UserInterfacePages/Catalog';
 import { Checkout } from './UserInterfacePages/Checkout';
+import { History } from './UserInterfacePages/History';
 import { Product } from './UserInterfacePages/Product';
 import { ThankYou } from './UserInterfacePages/ThankYou';
 
@@ -30,6 +31,8 @@ export const PageLayout: React.FC<PageLayoutProps> = ({
         case Pages.ResetPassword:
             return <ResetPassword changePage={changePage} />
 
+        case Pages.UserHistory:
+            return <History changePage={changePage} />
         case Pages.Catalog:
             return <Catalog changePage={changePage} />
         case Pages.Product:

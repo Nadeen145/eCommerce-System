@@ -10,7 +10,6 @@ import { Loading } from '../../Common/Loading';
 let url_order = `http://localhost:3001/orders/`;
 
 // TODO: Messege Broker => changeSatus 
-// TODO: Pendding more tests
 
 export interface TeamTaubBackoffice3Props {
   changePage(newPage: Pages): void,
