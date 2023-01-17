@@ -12,6 +12,8 @@ export const pages = [
     'TeamTaub Backoffice',
     'TeamTaub Backoffice',
     'TeamTaub Backoffice',
+
+    'Error Loading',
 ];
 
 export enum Pages{
@@ -27,4 +29,5 @@ export enum Pages{
     'TeamTaubBackoffice1',
     'TeamTaubBackoffice2',
     'TeamTaubBackoffice3',
+    'ErrorLoading',
 }

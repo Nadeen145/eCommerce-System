@@ -25,6 +25,7 @@ export interface ResetPasswordProps {
       ];
 
     const [loading, setLoading] = useState(false);
+    const [userNotFound, setUserNotFound] = useState(false);
 
     const [username, setUsername] = useState({value:'', error:true, errorDetail:''});
     const [secureQuestion, setSecureQuestion] = useState(questions[0]);
@@ -33,6 +34,8 @@ export interface ResetPasswordProps {
 
     const handleUsernameChange = (event:any) => {
         let data = event.target.value;
+        setUserNotFound(false);
+
         if(data === ''){
           setUsername({
             value: data,
@@ -49,9 +52,12 @@ export interface ResetPasswordProps {
   
     const handleSecureQuestion = (event:any) => {
         setSecureQuestion(event.target.value);
+        setUserNotFound(false);
     };
     const handleAnswer = (event:any) => {
         let data = event.target.value;
+        setUserNotFound(false);
+
         if(data === ''){
           setAnswer({
             value: data,
@@ -68,12 +74,22 @@ export interface ResetPasswordProps {
 
     const handleNewPasswordChange = (event:any) => {
         let data = event.target.value;
+        setUserNotFound(false);
+
         if(data === ''){
           setNewPassword({
             value: data,
             error: true,
             errorDetail: 'New Password cannot be empty!'});
             return;
+        }
+
+        if (data.length < 8) {
+          setNewPassword({
+            value: data,
+            error: true,
+            errorDetail: 'Weak password!'});
+          return;
         }
 
         setNewPassword({
@@ -103,10 +119,10 @@ export interface ResetPasswordProps {
 
           if(response.status === 200){
             changePage(Pages.Login);
-          }
-
+          } 
           setLoading(false);
         } catch{
+          setUserNotFound(true);
           setLoading(false);
         }
       }    
@@ -125,6 +141,15 @@ export interface ResetPasswordProps {
           <div className="Auth-form-container">
               <form className="Auth-form">
               <div className="Auth-form-content">
+
+
+              { userNotFound?
+                <div className='error'>Username not found!</div>
+                :
+                <></>
+              }
+
+
                   <div className="form-group mt-3">
                   <label>Username</label>
                   <input
@@ -139,7 +164,7 @@ export interface ResetPasswordProps {
                   {username.error && <p className='error'>{username.errorDetail}</p>}
   
                   <div className="form-group mt-3">
-                    <label>Secure Question</label>
+                    <label>Security Question</label>
                     <select className="form-control mt-1" value={secureQuestion} onChange={handleSecureQuestion}>
                       {questions.map((question) => (
                         <option>

@@ -49,14 +49,15 @@ export const Cart: React.FC<CartProps> = ({
       }
     } catch{
       setLoading(false);
+      changePage(Pages.ErrorLoading)
     }
-    setLoading(false);
   }
 
   useEffect(()=>{
     fetchData();
   }, [])
 
+  /*
   const handleAddToCart = async (product:any) => {
     try{
       let stock = parseInt(product['stock']);
@@ -135,6 +136,7 @@ export const Cart: React.FC<CartProps> = ({
     } catch{
     }
   };
+  */
 
   const handleRemoveFromCart = async(product:any) => {
     try{
@@ -171,7 +173,7 @@ export const Cart: React.FC<CartProps> = ({
         title={pages[Pages.Cart]}
       />
 
-      <button className='btn back-button' onClick={() => changePage(Pages.Product)}>
+      <button className='btn back-button' onClick={() => changePage(Pages.Catalog)}>
           ← Go Back
       </button>
 
@@ -190,7 +192,8 @@ export const Cart: React.FC<CartProps> = ({
           <div className="start-shopping">
           </div>
         </div>
-      ) : (
+      ) : 
+      (
         <div>
           <div className="cart-items">
             {products &&
@@ -207,11 +210,6 @@ export const Cart: React.FC<CartProps> = ({
                     </div>
                   </div>
                   <div className="cart-product-price">{cartItem['price']} ₪</div>
-                  <div className="cart-product-quantity">
-                    <button onClick={() => handleDecreaseCart(cartItem)}>-</button>
-                    <div className="count">{cartItem['quantity']}</div>
-                    <button onClick={() => handleAddToCart(cartItem)}>+</button>
-                  </div>
                   <div className="cart-product-total-price">
                     {cartItem['price']*cartItem['quantity']} ₪
                   </div>

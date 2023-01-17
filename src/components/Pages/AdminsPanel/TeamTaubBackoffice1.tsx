@@ -6,8 +6,11 @@ import { pages, Pages } from '../../../Constants';
 import { BackofficeNavbar } from './BackofficeNavebar';
 import axios from 'axios';
 import { Loading } from '../../Common/Loading';
+import ReactPaginate from 'react-paginate';
 
 let url_product = `http://localhost:3001/products/`;
+
+let productsPerPage = 8;
 
 export interface TeamTaubBackoffice1Props {
   changePage(newPage: Pages): void,
@@ -19,6 +22,13 @@ export const TeamTaubBackoffice1: React.FC<TeamTaubBackoffice1Props> = ({
 
   const [loading, setLoading] = useState(false);
   const [products, setProducts] = useState([]);
+  const [currentPage, setCurrentPage] = React.useState(0);
+
+  const handlePageClick = (data: { selected: number }) => {
+    let selected = data.selected;
+    setCurrentPage(selected);
+  }
+  const currentProducts = products.slice(currentPage * productsPerPage, (currentPage + 1) * productsPerPage);
 
     const updateProduct = async(id:any) => {
       localStorage.setItem('product', id);
@@ -63,6 +73,7 @@ export const TeamTaubBackoffice1: React.FC<TeamTaubBackoffice1Props> = ({
         }
       } catch{
         setLoading(false);
+        changePage(Pages.ErrorLoading)
       }
     }
 
@@ -91,8 +102,16 @@ export const TeamTaubBackoffice1: React.FC<TeamTaubBackoffice1Props> = ({
         </button>
 
         <div className='products-list-container'>
-            {products &&
-              products?.map((product) => (
+            {
+            
+            products.length === 0 ? (
+              <div className="center">
+                <h2 className='center'>There are no products!</h2>
+              </div>
+            ) : 
+            
+            currentProducts &&
+              currentProducts?.map((product) => (
                 <div key={product['id']} className="list-item-product split-screen">
 
                     <div className='text-container side3 padding-two-sides'>
@@ -122,6 +141,24 @@ export const TeamTaubBackoffice1: React.FC<TeamTaubBackoffice1Props> = ({
                 </div>
               ))}
         </div>
+
+        <div className='center'>
+          <ReactPaginate className='center'
+            previousLabel= "<"
+            nextLabel = ">"
+            breakLabel = "..."
+            pageCount={Math.ceil(products.length / productsPerPage)}
+            marginPagesDisplayed={2}
+            pageRangeDisplayed={5}
+            onPageChange={handlePageClick}
+            breakClassName = 'btn pagenation-button'
+            activeClassName = 'btn pagenation-active-button' 
+            pageClassName = 'btn pagenation-button' 
+            previousClassName = 'btn pagenation-sign-button' 
+            nextClassName = 'btn pagenation-sign-button' 
+          />
+        </div>
+
     </div>
 }
 

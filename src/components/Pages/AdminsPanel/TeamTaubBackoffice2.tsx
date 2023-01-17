@@ -288,9 +288,8 @@ export const TeamTaubBackoffice2: React.FC<TeamTaubBackoffice2Props> = ({
           }
         } catch{
           setLoading(false);
+          changePage(Pages.ErrorLoading)
         }
-
-        setLoading(false);
       }
   
       useEffect(() => {

@@ -23,7 +23,7 @@ export const History: React.FC<HistoryProps> = ({
     setLoading(true);
     try{
       const response = await axios.get(
-        url_order+localStorage.getItem('username'),
+        url_order, //+localStorage.getItem('username'),
         { withCredentials: true }
       );
 
@@ -33,8 +33,8 @@ export const History: React.FC<HistoryProps> = ({
       }
     } catch{
       setLoading(false);
+      changePage(Pages.ErrorLoading)
     }
-    setLoading(false);
   }
 
   useEffect(()=>{
@@ -49,46 +49,67 @@ export const History: React.FC<HistoryProps> = ({
         title={pages[Pages.UserHistory]}
       />
 
-      <button className='btn back-button' onClick={() => changePage(Pages.Product)}>
-          ← Go Back
-      </button>
+      <div>
+        <br></br>
+        <br></br>
+        <div className="center">
+          <h2 className='center'>{localStorage.getItem('username')}</h2>
+        </div>
+        <br></br>
+      </div>
 
       {
-        loading?
-        <div className='margin-top-container'>
-          <Loading /> 
-        </div>
-            :
-        <div>
-
-      <div className="cart-container">
-      {orders.length === 0 ? (
-        <div className="cart-empty">
-          <p>Yet no orders!</p>
-          <div className="start-shopping">
+          loading?
+          <div className='margin-top-container'>
+            <Loading /> 
           </div>
-        </div>
-      ) : (
-          <div className="cart-items">
-            {orders &&
-              orders.map((order) => (
-                <div className="cart-item " key={order['id']}>
-                  <div className="cart-product">
-                    <div>
-                      <h3>{order['id']}</h3>
-                      <p>{order['timestamp']}</p>
-                      <p>{order['status']}</p>
-                      <p>{order['items']}</p>
-                    </div>
+                  :
+          <div>
+            <div className='products-list-container'>
+              {
+                
+                orders.length === 0 ? (
+                  <div className="center">
+                    <h2 className='center'>There is no history available!</h2>
                   </div>
-                  <div className="cart-product-price">{order['totalPrice']} ₪</div>
-                </div>
-              ))}
+                ) : 
+                
+                orders &&
+                orders.map((order) => (
+                  <div key={order['id']} className="list-item-product split-screen">
+
+                      <div className='text-container side3 padding-two-sides'>
+                          <span>Date: {order['timestamp'].slice(0, 10)}</span>
+                          <br></br>
+                          <br></br>
+
+                          <span>Items: </span>
+                            {
+                              orders.map((order) => (
+                                <div>
+                                  <ul>order['username']</ul>
+                                </div>
+                              ))
+                            }
+                            
+                          <br></br>
+                          <span>Total price: {order['totalPrice']} ₪</span>
+                      </div>
+
+                      <div className='side1'>
+                          <div>Status: </div>
+                              <div className='center like-button'>
+                                {order['status']}
+                              </div>
+                      </div>
+
+                  </div>
+                ))}
+            </div>
           </div>
-      )}
-    </div>
-    </div>
-      }
+          }
+
+
     </div>
   );
 }

@@ -25,6 +25,7 @@ export interface SignupProps {
     ];
 
     const [loading, setLoading] = useState(false);
+    const [userExist, setUserExist] = useState(false);
 
     const [username, setUsername] = useState({value:'', error:true, errorDetail:''});
     const [password, setPassword] = useState({value:'', error:true, errorDetail:''});
@@ -34,6 +35,8 @@ export interface SignupProps {
 
     const handleUsernameChange = (event:any) => {
         let data = event.target.value;
+        setUserExist(false);
+
         if(data === ''){
           setUsername({
             value: data,
@@ -50,12 +53,22 @@ export interface SignupProps {
   
     const handlePasswordChange = (event:any) => {
         let data = event.target.value;
+        setUserExist(false);
+        
         if(data === ''){
           setPassword({
             value: data,
             error: true,
             errorDetail: 'Password cannot be empty!'});
             return;
+        }
+
+        if (data.length < 8) {
+          setPassword({
+            value: data,
+            error: true,
+            errorDetail: 'Weak password!'});
+          return;
         }
 
         if(data !== confirmPassword.value){
@@ -78,7 +91,8 @@ export interface SignupProps {
             errorDetail: ''});
     };
     const handleConfirmPasswordChange = (event: any) => {
-        if(password.value !== event.target.value){
+      setUserExist(false);
+      if(password.value !== event.target.value){
             setConfirmPassword({
                 value: event.target.value,
                 error: true,
@@ -94,10 +108,13 @@ export interface SignupProps {
     };
 
     const handleSecureQuestion = (event:any) => {
-        setSecureQuestion(event.target.value);
+      setUserExist(false);
+      setSecureQuestion(event.target.value);
     };
     const handleAnswer = (event:any) => {
         let data = event.target.value;
+        setUserExist(false);
+
         if(data === ''){
           setAnswer({
             value: data,
@@ -164,6 +181,7 @@ export interface SignupProps {
           localStorage.setItem('username', username.value);
           localStorage.setItem('permission', 'U');
 
+
           if(response.status === 200){
             if(localStorage.getItem("permission") == 'U'){
                 changePage(Pages.Catalog);
@@ -171,9 +189,9 @@ export interface SignupProps {
                 changePage(Pages.TeamTaubBackoffice1);
             }
           }
-
           setLoading(false);
         } catch{
+          setUserExist(true);
           setLoading(false);
         }
     }    
@@ -192,6 +210,13 @@ export interface SignupProps {
         <div className="Auth-form-container">
             <form className="Auth-form">
             <div className="Auth-form-content">
+
+            { userExist?
+                <div className='error'>Username already exist!</div>
+                :
+                <></>
+              }
+
                 <div className="form-group mt-3">
                 <label>Username</label>
                 <input
@@ -232,7 +257,7 @@ export interface SignupProps {
                 {confirmPassword.error && <p className='error'>{confirmPassword.errorDetail}</p>}
 
                 <div className="form-group mt-3">
-                  <label>Secure Question</label>
+                  <label>Security Question</label>
                   <select className="form-control mt-1" value={secureQuestion} onChange={handleSecureQuestion}>
                     {questions.map((question) => (
                       <option>

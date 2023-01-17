@@ -2,7 +2,6 @@ import React, {useEffect, useState} from 'react';
 import { Pages } from '../../../Constants';
 import './Auth.css';
 import axios from 'axios';
-import Cookies from 'universal-cookie';
 import { Loading } from '../../Common/Loading';
 
 let url_user = `http://localhost:3001/users/`;
@@ -68,13 +67,13 @@ export const Login: React.FC<LoginProps> = ({
       if(response.status === 200){
         localStorage.setItem('username', response.data["username"]);
         localStorage.setItem('permission', response.data["permission"]);
-      if(localStorage.getItem("permission") == 'U'){
+      if(localStorage.getItem("permission") === 'U'){
         changePage(Pages.Catalog);
       } else{
         changePage(Pages.TeamTaubBackoffice1);
       }
       setLoading(false);
-    }
+    } 
     } catch{
       setLoading(false);
     }
@@ -114,20 +113,17 @@ export const Login: React.FC<LoginProps> = ({
       localStorage.setItem('username', response.data["username"]);
       localStorage.setItem('permission', response.data["permission"]);
 
-      if(localStorage.getItem("permission") == 'U'){
+      if(localStorage.getItem("permission") === 'U'){
         changePage(Pages.Catalog);
       } else{
         changePage(Pages.TeamTaubBackoffice1);
       }
-    } else{
-      setUserNotFound(true);
     }
 
     setLoading(false);
   } catch{
     setUserNotFound(true);
-    setLoading(false);
-  }
+    setLoading(false);  }
   }
 
   useEffect(() => {
@@ -149,7 +145,7 @@ export const Login: React.FC<LoginProps> = ({
           <form className="Auth-form">
             <div className="Auth-form-content">
               { userNotFound?
-                <div className='error'>Username or password is wrong!</div>
+                <div className='error'>Incorrect username or password!</div>
                 :
                 <></>
               }

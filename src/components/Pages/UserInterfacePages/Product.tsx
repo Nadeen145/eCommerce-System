@@ -77,8 +77,8 @@ export const Product: React.FC<ProductProps> = ({
         }
       } catch{
         setLoading(false);
+        changePage(Pages.ErrorLoading)
       }
-      setLoading(false);
     }
 
     useEffect(() => {
