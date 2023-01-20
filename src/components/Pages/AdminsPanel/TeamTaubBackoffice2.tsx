@@ -150,6 +150,14 @@ export const TeamTaubBackoffice2: React.FC<TeamTaubBackoffice2Props> = ({
               errorDetail: 'Price cannot be smaller or qual to zero!'});
             return;
         }
+
+        if (parseInt(data) > 1000) {
+          setPrice({
+            value: data,
+            error: true,
+            errorDetail: 'Price cannot be bigger than 1000!'});
+          return;
+      }
           
         setPrice({
             value: data,

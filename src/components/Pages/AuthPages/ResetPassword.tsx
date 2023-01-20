@@ -32,6 +32,7 @@ export interface ResetPasswordProps {
     const [secureQuestion, setSecureQuestion] = useState<string>(questions[0]);
     const [answer, setAnswer] = useState({value:'', error:true, errorDetail:''});
     const [newPassword, setNewPassword] = useState({value:'', error:true, errorDetail:''});
+    const [confirmPassword, setConfirmPassword] = useState({value:'', error:true, errorDetail:''});
 
     const handleUsernameChange = (event:any) => {
         let data = event.target.value;
@@ -93,10 +94,40 @@ export interface ResetPasswordProps {
           return;
         }
 
+        if(data !== confirmPassword.value){
+          setConfirmPassword({
+              value: confirmPassword.value,
+              error: true,
+              errorDetail: 'Password and Confirm Password does not match!'
+          })
+      } else{
+          setConfirmPassword({
+              value: confirmPassword.value,
+              error: false,
+              errorDetail: ''
+          });
+      }
+
         setNewPassword({
             value: data,
             error: false,
             errorDetail: ''});
+    };
+    const handleConfirmPasswordChange = (event: any) => {
+      setUserNotFound(false);
+      if(newPassword.value !== event.target.value){
+            setConfirmPassword({
+                value: event.target.value,
+                error: true,
+                errorDetail: 'Password and Confirm Password does not match!'
+            })
+        } else{
+            setConfirmPassword({
+                value: event.target.value,
+                error: false,
+                errorDetail: ''
+            })
+        }
     };
 
     const changeUserPassword = async(event:any) => {
@@ -119,7 +150,7 @@ export interface ResetPasswordProps {
           );
 
           if(response.status === 200){
-            changePage(Pages.Login);
+            changePage(Pages.ResetSuccessfully);
           } 
         } catch{
           setUserNotFound(true);
@@ -145,7 +176,7 @@ export interface ResetPasswordProps {
 
 
               { userNotFound?
-                <div className='error'>Username not found!</div>
+                <div className='error'>Somethig went wrong!</div>
                 :
                 <></>
               }
@@ -201,6 +232,19 @@ export interface ResetPasswordProps {
                     </div>
                     {newPassword.error && <p className='error'>{newPassword.errorDetail}</p>}
   
+                    <div className="form-group mt-3">
+                    <label>Confirm Password</label>
+                    <input
+                        type="password"
+                        required
+                        className="form-control mt-1"
+                        placeholder="Confirm Password"
+                        onChange={handleConfirmPasswordChange}
+                        value={confirmPassword.value}
+                    />
+                    </div>
+                    {confirmPassword.error && <p className='error'>{confirmPassword.errorDetail}</p>}
+
   
                   <div className="d-grid gap-2 mt-3">
                   <button type="submit" className="btn btn-signup" onClick={(event)=>changeUserPassword(event)}>

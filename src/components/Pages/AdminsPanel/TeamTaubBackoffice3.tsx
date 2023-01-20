@@ -11,7 +11,7 @@ import ReactPaginate from 'react-paginate';
 let url_order = `https://gatewayserver.onrender.com/orders/`;
 let url_user = `https://gatewayserver.onrender.com/users/`;
 
-let ordersPerPage = 12;
+let ordersPerPage = 8;
 
 export interface TeamTaubBackoffice3Props {
   changePage(newPage: Pages): void,
@@ -182,12 +182,12 @@ export const TeamTaubBackoffice3: React.FC<TeamTaubBackoffice3Props> = ({
                               </div>
                           <br></br>
                           {
-                              order['status'] !== 'Pending'?
-                              <></>
-                              :
+                              order['status'] === 'Pending' && localStorage.getItem("permission") === "A"?
                               <button className='btn status-update-button' onClick={(event)=> changeSatus(event, order['id'])}>
                                   Mark as Delivered!
                               </button>
+                              :
+                              <></>
                           }
                       </div>
 

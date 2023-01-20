@@ -62,7 +62,7 @@ export const History: React.FC<HistoryProps> = ({
       if(response.status === 200){
         setOrders(response.data);
       }
-    } catch{
+    } catch(error:any){
       setLoading(false);
       changePage(Pages.ErrorLoading)
     }

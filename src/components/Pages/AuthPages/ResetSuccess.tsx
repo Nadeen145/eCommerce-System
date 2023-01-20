@@ -1,26 +1,21 @@
 import React from 'react';
-import './UserInterface.css';
+import './Auth.css';
 import { Header } from '../../AppHeader/Header';
 import { pages, Pages } from '../../../Constants';
 
-export interface ThankYouProps {
+export interface ResetSuccessProps {
   changePage(newPage: Pages): void,
 }
 
-export const ThankYou: React.FC<ThankYouProps> = ({
+export const ResetSuccess: React.FC<ResetSuccessProps> = ({
   changePage,  
 }) => {  
 
     return (
         <div className="root center">
   
-          <Header 
-            changePage={changePage} 
-            title={pages[Pages.ThankYou]}
-          />
-
             <div className='thank-you-text'>
-              <span>Thank you for buying</span>
+              <span>Your password updated successfully!</span>
               <br></br>
               <span>TeamTaub!</span>
             </div>
@@ -28,8 +23,8 @@ export const ThankYou: React.FC<ThankYouProps> = ({
             <br></br>
 
             <button className='btn back-button' 
-                    onClick={() => changePage(Pages.Catalog)}>
-              ← Go Back
+                    onClick={() => changePage(Pages.Login)}>
+              Login
             </button>
 
         </div>

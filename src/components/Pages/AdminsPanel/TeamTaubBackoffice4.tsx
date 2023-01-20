@@ -10,7 +10,7 @@ import ReactPaginate from 'react-paginate';
 // let url_user = `http://localhost:3001/users/`;
 let url_user = `https://gatewayserver.onrender.com/users/`;
 
-let usersPerPage = 12;
+let usersPerPage = 8;
 
 export interface TeamTaubBackoffice4Props {
   changePage(newPage: Pages): void,

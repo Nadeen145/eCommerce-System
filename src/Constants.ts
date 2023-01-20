@@ -4,6 +4,7 @@ export const pages = [
     'Signup',
     'Reset Password',
     'User History',
+    'Reset Successfully',
 
     'Catalog',
     'Product',
@@ -24,6 +25,7 @@ export enum Pages{
     'Signup',
     'ResetPassword',
     'UserHistory',
+    'ResetSuccessfully',
 
     'Catalog',
     'Product',

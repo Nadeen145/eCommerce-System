@@ -8,6 +8,7 @@ import { TeamTaubBackoffice3 } from './AdminsPanel/TeamTaubBackoffice3';
 import { TeamTaubBackoffice4 } from './AdminsPanel/TeamTaubBackoffice4';
 import { Login } from './AuthPages/Login';
 import { ResetPassword } from './AuthPages/ResetPassword';
+import { ResetSuccess } from './AuthPages/ResetSuccess';
 import { Signup } from './AuthPages/Signup';
 import { Cart } from './UserInterfacePages/Cart';
 import { Catalog } from './UserInterfacePages/Catalog';
@@ -32,7 +33,9 @@ export const PageLayout: React.FC<PageLayoutProps> = ({
             return <Signup changePage={changePage} />
         case Pages.ResetPassword:
             return <ResetPassword changePage={changePage} />
-
+        case Pages.ResetSuccessfully:
+            return <ResetSuccess changePage={changePage} />
+    
         case Pages.UserHistory:
             return <History changePage={changePage} />
         case Pages.Catalog:

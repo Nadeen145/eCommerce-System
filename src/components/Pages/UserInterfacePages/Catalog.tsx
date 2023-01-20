@@ -10,7 +10,7 @@ import ReactPaginate from 'react-paginate';
 let url_product = `https://gatewayserver.onrender.com/products/`;
 let url_user = `https://gatewayserver.onrender.com/users/`;
 
-let productsPerPage = 12;
+let productsPerPage = 8;
 
 export interface CatalogProps {
   changePage(newPage: Pages): void,

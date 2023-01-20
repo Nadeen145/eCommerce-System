@@ -314,10 +314,10 @@ export const Checkout: React.FC<CheckoutProps> = ({
           holder: nameCreditCard.value,
           cvv: cvv.value,
           exp: expirationDate.value,
-          charge: "66",
+          charge: ''+totalPrice,
           username: localStorage.getItem('username'),
           address: adress.value,
-          totalPrice: 66
+          totalPrice: totalPrice
         },
         { withCredentials: true }
       );
