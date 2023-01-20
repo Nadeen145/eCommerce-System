@@ -4,7 +4,8 @@ import { Pages } from '../../../Constants';
 import { Loading } from '../../Common/Loading';
 import './Auth.css';
 
-let url_user = `http://localhost:3001/users/`;
+// let url_user = `http://localhost:3001/users/`;
+let url_user = `https://gatewayserver.onrender.com/users/`;
 
 export interface ResetPasswordProps {
     changePage(newPage: Pages): void,
@@ -24,11 +25,11 @@ export interface ResetPasswordProps {
         '▼ What is your habbit?'
       ];
 
-    const [loading, setLoading] = useState(false);
-    const [userNotFound, setUserNotFound] = useState(false);
+    const [loading, setLoading] = useState<boolean>(false);
+    const [userNotFound, setUserNotFound] = useState<boolean>(false);
 
     const [username, setUsername] = useState({value:'', error:true, errorDetail:''});
-    const [secureQuestion, setSecureQuestion] = useState(questions[0]);
+    const [secureQuestion, setSecureQuestion] = useState<string>(questions[0]);
     const [answer, setAnswer] = useState({value:'', error:true, errorDetail:''});
     const [newPassword, setNewPassword] = useState({value:'', error:true, errorDetail:''});
 
@@ -120,11 +121,11 @@ export interface ResetPasswordProps {
           if(response.status === 200){
             changePage(Pages.Login);
           } 
-          setLoading(false);
         } catch{
           setUserNotFound(true);
           setLoading(false);
         }
+        setLoading(false);
       }    
 
       return (

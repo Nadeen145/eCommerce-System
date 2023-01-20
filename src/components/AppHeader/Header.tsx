@@ -1,5 +1,4 @@
 import React from 'react';
-import { Pages } from '../../Constants';
 import './AppHeader.css';
 import { Navbar } from './Navbar';
 
@@ -18,11 +17,6 @@ export const Header: React.FC<HeaderProps> = ({
                 <h1 className='app-header'> {title} </h1>
                 <div className='space container-user-interface'>
                     <Navbar changePage={changePage} />
-                    {/* <div className='user-circle'>
-                        <button className='btn' onClick={()=>{changePage(Pages.UserHistory)}}>
-                            〇
-                        </button>
-                    </div> */}
                 </div>
             </div>
         </div>
@@ -32,11 +26,6 @@ export const Header: React.FC<HeaderProps> = ({
                 <h1 className='app-header'> {title} </h1>
                 <div className='space container-backoffice'>
                     <Navbar changePage={changePage} />
-                    {/* <div className='user-circle'>
-                        <button className='btn' onClick={()=>{changePage(Pages.UserHistory)}}>
-                            〇
-                        </button>
-                    </div> */}
                 </div>
             </div>
         </div>

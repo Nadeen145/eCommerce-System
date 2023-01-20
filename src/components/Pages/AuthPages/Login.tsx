@@ -4,8 +4,8 @@ import './Auth.css';
 import axios from 'axios';
 import { Loading } from '../../Common/Loading';
 
-let url_user = `http://localhost:3001/users/`;
-// let url_user = `https://gatewayserver.onrender.com/users/`;
+// let url_user = `http://localhost:3001/users/`;
+let url_user = `https://gatewayserver.onrender.com/users/`;
 
 export interface LoginProps {
   changePage(newPage: Pages): void,
@@ -15,8 +15,8 @@ export const Login: React.FC<LoginProps> = ({
   changePage,  
 }) => {
 
-  const [loading, setLoading] = useState(false);
-  const [userNotFound, setUserNotFound] = useState(false);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [userNotFound, setUserNotFound] = useState<boolean>(false);
 
   const [username, setUsername] = useState({value:'', error:true, errorDetail:''});
   const [password, setPassword] = useState({value:'', error:true, errorDetail:''});
@@ -84,22 +84,22 @@ export const Login: React.FC<LoginProps> = ({
     setLoading(true);
 
     try{
-    if(username.error === true || password.error === true){
-      if(username.error && username.value === ""){
-        setUsername({
-          value: username.value,
-          error: true,
-          errorDetail: 'Username cannot be empty!'});
+      if(username.error === true || password.error === true){
+        if(username.error && username.value === ""){
+          setUsername({
+            value: username.value,
+            error: true,
+            errorDetail: 'Username cannot be empty!'});
+        }
+        if(password.error && password.value === ""){
+          setPassword({
+            value: password.value,
+            error: true,
+            errorDetail: 'Password cannot be empty!'});
+        }
+        setLoading(false);
+        return;
       }
-      if(password.error && password.value === ""){
-        setPassword({
-          value: password.value,
-          error: true,
-          errorDetail: 'Password cannot be empty!'});
-      }
-      setLoading(false);
-      return;
-    }
 
     const response = await axios.post(
       url_user+'login',
@@ -120,10 +120,11 @@ export const Login: React.FC<LoginProps> = ({
       }
     }
 
-    setLoading(false);
   } catch{
     setUserNotFound(true);
-    setLoading(false);  }
+    setLoading(false);  
+  }
+    setLoading(false);
   }
 
   useEffect(() => {

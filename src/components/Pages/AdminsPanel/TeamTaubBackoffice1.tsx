@@ -1,16 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import './AdminsPanel.css';
 import { Header } from '../../AppHeader/Header';
-import { PageLayout } from '../PageLayout';
 import { pages, Pages } from '../../../Constants';
 import { BackofficeNavbar } from './BackofficeNavebar';
 import axios from 'axios';
 import { Loading } from '../../Common/Loading';
 import ReactPaginate from 'react-paginate';
 
-let url_product = `http://localhost:3001/products/`;
+// let url_product = `http://localhost:3001/products/`;
+let url_product = `https://gatewayserver.onrender.com/products/`;
+let url_user = `https://gatewayserver.onrender.com/users/`;
 
-let productsPerPage = 8;
+let productsPerPage = 12;
 
 export interface TeamTaubBackoffice1Props {
   changePage(newPage: Pages): void,
@@ -20,18 +21,66 @@ export const TeamTaubBackoffice1: React.FC<TeamTaubBackoffice1Props> = ({
   changePage,  
 }) => {  
 
-  const [loading, setLoading] = useState(false);
-  const [products, setProducts] = useState([]);
-  const [currentPage, setCurrentPage] = React.useState(0);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [products, setProducts] = useState<[]>([]);
+  const [currentPage, setCurrentPage] = React.useState<number>(0);
+  const [productsLength, setProductsLength] = useState<number>(0);
 
-  const handlePageClick = (data: { selected: number }) => {
-    let selected = data.selected;
-    setCurrentPage(selected);
+  const logout = async() => {
+    setLoading(true);
+    try{
+        const response1 = await axios.get(
+          url_user+"permission/"+ localStorage.getItem("username"), { withCredentials: true }
+        );
+    
+        if(response1.status === 200){
+            if(response1.data['permission'] === localStorage.getItem("permission")){
+              return;
+            }
+        }
+
+        const response2 = await axios.post(
+          url_user+"logout", {}, { withCredentials: true }
+        );
+    
+        if(response2.status === 200){
+            localStorage.clear();
+            setLoading(false);
+            changePage(Pages.Login);
+        }
+    }
+    catch(error){
+
+    }
+    setLoading(false);
   }
-  const currentProducts = products.slice(currentPage * productsPerPage, (currentPage + 1) * productsPerPage);
+
+  const handlePageClick = async(data: { selected: number }) => {
+    setLoading(true);
+    await logout();
+
+    try{
+      const response = await axios.get(
+        url_product+"page/"+productsPerPage+"/"+data.selected,
+        { withCredentials: true }
+      );
+
+      if(response.status === 200){
+        setProducts(response.data['products']);
+        setProductsLength(response.data['productsNum']);
+      }
+    } catch{
+      setLoading(false);
+      changePage(Pages.ErrorLoading)
+    }
+
+    setCurrentPage(data.selected);
+    setLoading(false);
+  }
 
     const updateProduct = async(id:any) => {
       localStorage.setItem('product', id);
+      await logout();
       changePage(Pages.TeamTaubBackoffice2);
     }
 
@@ -61,14 +110,17 @@ export const TeamTaubBackoffice1: React.FC<TeamTaubBackoffice1Props> = ({
 
     const fetchData = async() => {
       setLoading(true);
+      await logout();
+
       try{
         const response = await axios.get(
-          url_product,
+          url_product+"page/"+productsPerPage+"/1",
           { withCredentials: true }
         );
   
         if(response.status === 200){
-          await setProducts(response.data);      
+          setProducts(response.data['products']);
+          setProductsLength(response.data['productsNum']);
           setLoading(false);
         }
       } catch{
@@ -88,7 +140,7 @@ export const TeamTaubBackoffice1: React.FC<TeamTaubBackoffice1Props> = ({
           title={pages[Pages.TeamTaubBackoffice1]}
         />
 
-        <BackofficeNavbar changePage={changePage} isProductsButton={true} />
+        <BackofficeNavbar changePage={changePage} page={0} />
 
     {
     loading?
@@ -97,9 +149,14 @@ export const TeamTaubBackoffice1: React.FC<TeamTaubBackoffice1Props> = ({
     </div>
             :
     <div>
+
+      { localStorage.getItem("permission") === "A" || localStorage.getItem("permission") === "M"?
         <button className='btn new-button' onClick={() => updateProduct('')}>
             + New Product
         </button>
+        :
+        <></>
+      }
 
         <div className='products-list-container'>
             {
@@ -110,8 +167,8 @@ export const TeamTaubBackoffice1: React.FC<TeamTaubBackoffice1Props> = ({
               </div>
             ) : 
             
-            currentProducts &&
-              currentProducts?.map((product) => (
+            products &&
+              products.map((product) => (
                 <div key={product['id']} className="list-item-product split-screen">
 
                     <div className='text-container side3 padding-two-sides'>
@@ -125,17 +182,27 @@ export const TeamTaubBackoffice1: React.FC<TeamTaubBackoffice1Props> = ({
                         <span>Price: {product['price']} ₪</span>
                         <br></br>
 
-                        <span>Amount: {product['price']}</span>
+                        <span>Amount: {product['stock']}</span>
                     </div>
 
                     <div className='side1'>
+                      { localStorage.getItem("permission") === "A" || localStorage.getItem("permission") === "M"?
                         <button className='btn update-button' onClick={() => updateProduct(product['id'])}>
                             Update
                         </button>
+                        :
+                        <></>
+                      }
+
                         <br></br>
+
+                      { localStorage.getItem("permission") === "A"?
                         <button className='btn remove-button' onClick={() => removeProduct(product['id'], product)}>
                             Remove
                         </button>
+                        :
+                        <></>
+                      }  
                     </div>
 
                 </div>
@@ -147,7 +214,7 @@ export const TeamTaubBackoffice1: React.FC<TeamTaubBackoffice1Props> = ({
             previousLabel= "<"
             nextLabel = ">"
             breakLabel = "..."
-            pageCount={Math.ceil(products.length / productsPerPage)}
+            pageCount={Math.ceil(productsLength / productsPerPage)}
             marginPagesDisplayed={2}
             pageRangeDisplayed={5}
             onPageChange={handlePageClick}

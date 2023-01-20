@@ -5,6 +5,7 @@ import { ErrorLoading } from '../Common/ErrorLoading';
 import { TeamTaubBackoffice1 } from './AdminsPanel/TeamTaubBackoffice1';
 import { TeamTaubBackoffice2 } from './AdminsPanel/TeamTaubBackoffice2';
 import { TeamTaubBackoffice3 } from './AdminsPanel/TeamTaubBackoffice3';
+import { TeamTaubBackoffice4 } from './AdminsPanel/TeamTaubBackoffice4';
 import { Login } from './AuthPages/Login';
 import { ResetPassword } from './AuthPages/ResetPassword';
 import { Signup } from './AuthPages/Signup';
@@ -51,6 +52,10 @@ export const PageLayout: React.FC<PageLayoutProps> = ({
             return <TeamTaubBackoffice2 changePage={changePage} />
         case Pages.TeamTaubBackoffice3:
             return <TeamTaubBackoffice3 changePage={changePage} />
+        case Pages.TeamTaubBackoffice3:
+            return <TeamTaubBackoffice3 changePage={changePage} />
+        case Pages.TeamTaubBackoffice4:
+            return <TeamTaubBackoffice4 changePage={changePage} />
 
         case Pages.ErrorLoading:
             return <ErrorLoading changePage={changePage} />    

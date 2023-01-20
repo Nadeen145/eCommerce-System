@@ -3,9 +3,6 @@ import './Common.css'
 import { Header } from '../AppHeader/Header';
 import { pages, Pages } from '../../Constants';
 
-
-let url_order = `http://localhost:3001/orders/`;
-
 export interface ErrorLoadingProps {
   changePage(newPage: Pages): void,
 }
@@ -18,7 +15,7 @@ export const ErrorLoading: React.FC<ErrorLoadingProps> = ({
 
       <Header 
         changePage={changePage} 
-        title={pages[Pages.ThankYou]}
+        title={pages[Pages.ErrorLoading]}
       />
 
         <div className='thank-you-text'>

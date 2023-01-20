@@ -3,7 +3,8 @@ import React, { useEffect, useState } from 'react';
 import { Pages, pages } from '../../Constants';
 import './AppHeader.css';
 
-let url_user = `http://localhost:3001/users/`;
+// let url_user = `http://localhost:3001/users/`;
+let url_user = `https://gatewayserver.onrender.com/users/`;
 
 export interface NavbarProps {
     changePage(newPage: Pages): void;
@@ -15,15 +16,20 @@ export const Navbar: React.FC<NavbarProps> = ({
     const [isUserInterface, setIsUserInterface] = useState(true);
 
     const logout = async() => {
-        const response = await axios.post(
-          url_user+"logout", {}, { withCredentials: true }
-        );
-    
-        if(response.status === 200){
-            localStorage.clear();
-            changePage(Pages.Login);
+        try{
+            const response = await axios.post(
+            url_user+"logout", {}, { withCredentials: true }
+            );
+        
+            if(response.status === 200){
+                localStorage.clear();
+                changePage(Pages.Login);
+            }
         }
-      }
+        catch(error){
+
+        }
+    }
 
     useEffect(()=>{
         if(localStorage.getItem('permission') === 'U'){

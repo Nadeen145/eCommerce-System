@@ -1,18 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import './AdminsPanel.css';
 import { Header } from '../../AppHeader/Header';
-import { PageLayout } from '../PageLayout';
 import { pages, Pages } from '../../../Constants';
 import { BackofficeNavbar } from './BackofficeNavebar';
 import axios from 'axios';
 import { Loading } from '../../Common/Loading';
 import ReactPaginate from 'react-paginate';
 
-let url_order = `http://localhost:3001/orders/`;
+// let url_order = `http://localhost:3001/orders/`;
+let url_order = `https://gatewayserver.onrender.com/orders/`;
+let url_user = `https://gatewayserver.onrender.com/users/`;
 
-let ordersPerPage = 8;
-
-// TODO: Messege Broker => changeSatus 
+let ordersPerPage = 12;
 
 export interface TeamTaubBackoffice3Props {
   changePage(newPage: Pages): void,
@@ -22,17 +21,67 @@ export const TeamTaubBackoffice3: React.FC<TeamTaubBackoffice3Props> = ({
   changePage,  
 }) => {  
 
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState<boolean>(false);
   const [orders, setOrders] = useState<any[]>([]);
-  const [currentPage, setCurrentPage] = React.useState(0);
+  const [currentPage, setCurrentPage] = React.useState<number>(0);
+  const [ordersLength, setOrdersLength] = useState<number>(0);
 
-  const handlePageClick = (data: { selected: number }) => {
-    let selected = data.selected;
-    setCurrentPage(selected);
+  const logout = async() => {
+    setLoading(true);
+    try{
+        const response1 = await axios.get(
+          url_user+"permission/"+ localStorage.getItem("username"), { withCredentials: true }
+        );
+    
+        if(response1.status === 200){
+            if(response1.data['permission'] === localStorage.getItem("permission")){
+              return;
+            }
+        }
+
+        const response2 = await axios.post(
+          url_user+"logout", {}, { withCredentials: true }
+        );
+    
+        if(response2.status === 200){
+            localStorage.clear();
+            setLoading(false);
+            changePage(Pages.Login);
+        }
+    }
+    catch(error){
+
+    }
+    setLoading(false);
   }
-  const currentOrders = orders.slice(currentPage * ordersPerPage, (currentPage + 1) * ordersPerPage);
+
+  const handlePageClick = async(data: { selected: number }) => {
+    setLoading(true);
+    await logout();
+
+    try{
+      const response = await axios.get(
+        url_order+"page/"+ordersPerPage+"/"+data.selected,
+        { withCredentials: true }
+      );
+
+      if(response.status === 200){
+        setOrders(response.data['orders']);
+        setOrdersLength(response.data['ordersNum']);
+      }
+    } catch{
+      setLoading(false);
+      changePage(Pages.ErrorLoading)
+    }
+
+    setCurrentPage(data.selected);
+    setLoading(false);
+  }
 
   const changeSatus = async(event:any, id:any) => {
+    setLoading(true);
+    await logout();
+
     try{
       const response = await axios.put(
         url_order+id,
@@ -54,31 +103,33 @@ export const TeamTaubBackoffice3: React.FC<TeamTaubBackoffice3Props> = ({
             return item;
           }
         })
-
         setOrders(newOrders);
+        setLoading(false);
       }
     } catch{
+      setLoading(false);
     }
   }
 
     const fetchData = async() => {
       setLoading(true);
+      await logout();
 
       try{
         const response = await axios.get(
-          url_order,
+          url_order+"page/"+ordersPerPage+"/1",
           { withCredentials: true }
         );
 
         if(response.status === 200){
-          console.log(response.data);
-          setOrders(response.data);  
-          setLoading(false);
-        }
+          setOrders(response.data['orders']);
+          setOrdersLength(response.data['ordersNum']);        }
       } catch{
         setLoading(false);
         changePage(Pages.ErrorLoading)
       }
+
+      setLoading(false);
     }
 
     useEffect(() => {
@@ -92,11 +143,7 @@ export const TeamTaubBackoffice3: React.FC<TeamTaubBackoffice3Props> = ({
             title={pages[Pages.TeamTaubBackoffice1]}
           />
   
-          <BackofficeNavbar changePage={changePage} isProductsButton={false} />
-  
-          {/* <div className='order-page-option-bar-text center'>
-                <span>Orders Page Option Bar</span>
-          </div> */}
+          <BackofficeNavbar changePage={changePage} page={1} />
 
           {
           loading?
@@ -114,8 +161,8 @@ export const TeamTaubBackoffice3: React.FC<TeamTaubBackoffice3Props> = ({
                 </div>
               ) : 
               
-              currentOrders &&
-                currentOrders.map((order) => (
+              orders &&
+                orders.map((order) => (
                   <div key={order['id']} className="list-item-product split-screen">
 
                       <div className='text-container side3 padding-two-sides'>
@@ -148,22 +195,26 @@ export const TeamTaubBackoffice3: React.FC<TeamTaubBackoffice3Props> = ({
                 ))}
             </div>
 
-            <div className='center'>
-            <ReactPaginate className='center'
-              previousLabel= "<"
-              nextLabel = ">"
-              breakLabel = "..."
-              pageCount={Math.ceil(orders.length / ordersPerPage)}
-              marginPagesDisplayed={2}
-              pageRangeDisplayed={5}
-              onPageChange={handlePageClick}
-              breakClassName = 'btn pagenation-button'
-              activeClassName = 'btn pagenation-active-button' 
-              pageClassName = 'btn pagenation-button' 
-              previousClassName = 'btn pagenation-sign-button' 
-              nextClassName = 'btn pagenation-sign-button' 
-            />
-          </div>
+            { orders && orders.length > 0? 
+                <div className='center'>
+                  <ReactPaginate className='center'
+                    previousLabel= "<"
+                    nextLabel = ">"
+                    breakLabel = "..."
+                    pageCount={Math.ceil(ordersLength / ordersPerPage)}
+                    marginPagesDisplayed={2}
+                    pageRangeDisplayed={5}
+                    onPageChange={handlePageClick}
+                    breakClassName = 'btn pagenation-button'
+                    activeClassName = 'btn pagenation-active-button' 
+                    pageClassName = 'btn pagenation-button' 
+                    previousClassName = 'btn pagenation-sign-button' 
+                    nextClassName = 'btn pagenation-sign-button' 
+                  />
+                </div>
+                :
+                <></>
+            }
 
           </div>
 

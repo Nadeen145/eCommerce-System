@@ -1,13 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import './UserInterface.css';
 import { Header } from '../../AppHeader/Header';
-import { PageLayout } from '../PageLayout';
 import { pages, Pages } from '../../../Constants';
 import axios from 'axios';
 import { Loading } from '../../Common/Loading';
 
-let url_product = `http://localhost:3001/products/`;
-let url_cart = `http://localhost:3001/carts/`;
+// let url_product = `http://localhost:3001/products/`;
+// let url_cart = `http://localhost:3001/carts/`;
+
+let url_product = `https://gatewayserver.onrender.com/products/`;
+let url_cart = `https://gatewayserver.onrender.com/carts/`;
+let url_user = `https://gatewayserver.onrender.com/users/`;
 
 export interface ProductProps {
   changePage(newPage: Pages): void,
@@ -19,16 +22,45 @@ export const Product: React.FC<ProductProps> = ({
 
     let imageNotAvailable = "https://st4.depositphotos.com/14953852/22772/v/600/depositphotos_227725020-stock-illustration-image-available-icon-flat-vector.jpg"
 
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState<boolean>(false);
     const [product, setProduct] = useState<any[]>([]);
-    const [quantity, setQuantity] = useState(1);
+    const [quantity, setQuantity] = useState<number>(1);
+
+    const logout = async() => {
+      setLoading(true);
+      try{
+          const response1 = await axios.get(
+            url_user+"permission/"+ localStorage.getItem("username"), { withCredentials: true }
+          );
+      
+          if(response1.status === 200){
+              if(response1.data['permission'] === localStorage.getItem("permission")){
+                return;
+              }
+          }
+  
+          const response2 = await axios.post(
+            url_user+"logout", {}, { withCredentials: true }
+          );
+      
+          if(response2.status === 200){
+              localStorage.clear();
+              setLoading(false);
+              changePage(Pages.Login);
+          }
+      }
+      catch(error){
+  
+      }
+      setLoading(false);
+    }
 
     const increase = () => {
-        let stock = parseInt(product[0]['stock']);
-        if(quantity >= stock){
-          return;
-        }
-        setQuantity(quantity => quantity + 1);
+      let stock = parseInt(product[0]['stock']);
+      if(quantity >= stock){
+        return;
+      }
+      setQuantity(quantity => quantity + 1);
     };
     const decrease = () => {
         if(quantity <= 1){
@@ -37,8 +69,10 @@ export const Product: React.FC<ProductProps> = ({
         setQuantity(quantity => quantity - 1);
     };
 
-    const goToCart = async(id:any) => {
+    const goToCart = async(id:string) => {
       setLoading(true);
+      await logout();
+
       try{
         const response = await axios.put(
           url_cart+localStorage.getItem('username'),
@@ -54,7 +88,7 @@ export const Product: React.FC<ProductProps> = ({
           setProduct(product);
 
           setLoading(false);
-          changePage(Pages.Cart)
+          changePage(Pages.Catalog);
         }
       } catch{
         setLoading(false);
@@ -64,21 +98,25 @@ export const Product: React.FC<ProductProps> = ({
 
     const fetchData = async() => {
       setLoading(true);
+      await logout();
+
       try{
         const response = await axios.get(
           url_product+localStorage.getItem('product'),
           { withCredentials: true }
         );
   
+        localStorage.setItem("product", '');
+
         if(response.status === 200){
           product.push(response.data);
           setProduct(product);
-          setLoading(false);
         }
       } catch{
         setLoading(false);
         changePage(Pages.ErrorLoading)
       }
+      setLoading(false);
     }
 
     useEffect(() => {

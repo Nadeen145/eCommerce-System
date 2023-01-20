@@ -4,7 +4,8 @@ import { Pages } from '../../../Constants';
 import { Loading } from '../../Common/Loading';
 import './Auth.css';
 
-let url_user = `http://localhost:3001/users/`;
+// let url_user = `http://localhost:3001/users/`;
+let url_user = `https://gatewayserver.onrender.com/users/`;
 
 export interface SignupProps {
     changePage(newPage: Pages): void,
@@ -24,13 +25,13 @@ export interface SignupProps {
       '▼ What is your habbit?'
     ];
 
-    const [loading, setLoading] = useState(false);
-    const [userExist, setUserExist] = useState(false);
+    const [loading, setLoading] = useState<boolean>(false);
+    const [userExist, setUserExist] = useState<boolean>(false);
 
     const [username, setUsername] = useState({value:'', error:true, errorDetail:''});
     const [password, setPassword] = useState({value:'', error:true, errorDetail:''});
     const [confirmPassword, setConfirmPassword] = useState({value:'', error:true, errorDetail:''});
-    const [secureQuestion, setSecureQuestion] = useState(questions[0]);
+    const [secureQuestion, setSecureQuestion] = useState<string>(questions[0]);
     const [answer, setAnswer] = useState({value:'', error:true, errorDetail:''});
 
     const handleUsernameChange = (event:any) => {
@@ -189,11 +190,12 @@ export interface SignupProps {
                 changePage(Pages.TeamTaubBackoffice1);
             }
           }
-          setLoading(false);
         } catch{
           setUserExist(true);
           setLoading(false);
         }
+
+        setLoading(false);
     }    
 
     return (

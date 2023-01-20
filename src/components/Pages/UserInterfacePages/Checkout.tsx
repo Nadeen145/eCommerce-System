@@ -1,8 +1,13 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import './UserInterface.css';
 import { Header } from '../../AppHeader/Header';
-import { PageLayout } from '../PageLayout';
 import { pages, Pages } from '../../../Constants';
+import axios from 'axios';
+import { Loading } from '../../Common/Loading';
+
+let url_payment = `https://gatewayserver.onrender.com/payment/`;
+let url_user = `https://gatewayserver.onrender.com/users/`;
+let url_cart = `https://gatewayserver.onrender.com/carts/`;
 
 export interface CheckoutProps {
   changePage(newPage: Pages): void,
@@ -12,86 +17,10 @@ export const Checkout: React.FC<CheckoutProps> = ({
   changePage,  
 }) => {  
 
-  //TODO: product
-  let cart = [
-        {
-          _id: 1,
-          name: "dd",
-          image: {
-            url: "https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885__480.jpg"
-          },
-          desc: "dfslkfjlj",
-          price: 100,
-          category: "hat",
-          quantity:10
-        },
-        {
-          _id: 1,
-          name: "dd",
-          image: {
-            url: "https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885__480.jpg"
-          },
-          desc: "dfslkfjlj",
-          price: 100,
-          category: "hat",
-          quantity:10
-        },
-        {
-          _id: 1,
-          name: "dd",
-          image: {
-            url: "https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885__480.jpg"
-          },
-          desc: "dfslkfjlj",
-          price: 100,
-          category: "hat",
-          quantity:10
-        },
-        {
-          _id: 1,
-          name: "dd",
-          image: {
-            url: "https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885__480.jpg"
-          },
-          desc: "dfslkfjlj",
-          price: 100,
-          category: "hat",
-          quantity:10
-        },
-        {
-          _id: 1,
-          name: "dd",
-          image: {
-            url: "https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885__480.jpg"
-          },
-          desc: "dfslkfjlj",
-          price: 100,
-          category: "hat",
-          quantity:10
-        },
-        {
-          _id: 1,
-          name: "dd",
-          image: {
-            url: "https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885__480.jpg"
-          },
-          desc: "dfslkfjlj",
-          price: 100,
-          category: "hat",
-          quantity:10
-        },
-        {
-          _id: 1,
-          name: "dd",
-          image: {
-            url: "https://cdn.pixabay.com/photo/2015/04/23/22/00/tree-736885__480.jpg"
-          },
-          desc: "dfslkfjlj",
-          price: 100,
-          category: "hat",
-          quantity:10
-        }
-  ]
+  const [loading, setLoading] = useState<boolean>(false);
+  const [paymentFailed, setPaymentFailed] = useState({error:false, errorDetail:''});
+  const [totalPrice, setTotalPrice] = useState<number>(0);
+  const [products, setProducts] = useState<any[]>([]);
 
   const [nameAdress, setNameAdress] = useState({value:'', error:true, errorDetail:''});
   const [adress, setAdress] = useState({value:'', error:true, errorDetail:''});
@@ -101,8 +30,44 @@ export const Checkout: React.FC<CheckoutProps> = ({
   const [cvv, setCvv] = useState({value:'', error:true, errorDetail:''});
   const [expirationDate, setExpirationDate] = useState({value:'', error:true, errorDetail:''});
 
+  const logout = async() => {
+    setLoading(true);
+    try{
+        const response1 = await axios.get(
+          url_user+"permission/"+ localStorage.getItem("username"), { withCredentials: true }
+        );
+    
+        if(response1.status === 200){
+            if(response1.data['permission'] === localStorage.getItem("permission")){
+              return;
+            }
+        }
+
+        const response2 = await axios.post(
+          url_user+"logout", {}, { withCredentials: true }
+        );
+    
+        if(response2.status === 200){
+            localStorage.clear();
+            setLoading(false);
+            changePage(Pages.Login);
+        }
+    }
+    catch(error){
+
+    }
+    setLoading(false);
+  }
+
   const handleNameAdress = (event:any) => {
     let data = event.target.value;
+    setPaymentFailed(
+      {
+        error: false,
+        errorDetail: ''
+      }
+    );
+
     if(data === ''){
       setNameAdress({
         value: data,
@@ -118,6 +83,13 @@ export const Checkout: React.FC<CheckoutProps> = ({
   };
   const handleAdress = (event:any) => {
     let data = event.target.value;
+    setPaymentFailed(
+      {
+        error: false,
+        errorDetail: ''
+      }
+    );
+
     if(data === ''){
       setAdress({
         value: data,
@@ -133,6 +105,13 @@ export const Checkout: React.FC<CheckoutProps> = ({
 
   const handleCardNumber = (event:any) => {
     let data = event.target.value;
+    setPaymentFailed(
+      {
+        error: false,
+        errorDetail: ''
+      }
+    );
+
     if(data === ''){
       setCardNumber({
         value: data,
@@ -156,6 +135,13 @@ export const Checkout: React.FC<CheckoutProps> = ({
   };
   const handleNameCreditCard = (event:any) => {
     let data = event.target.value;
+    setPaymentFailed(
+      {
+        error: false,
+        errorDetail: ''
+      }
+    );
+
     if(data === ''){
       setNameCreditCard({
         value: data,
@@ -171,6 +157,13 @@ export const Checkout: React.FC<CheckoutProps> = ({
   };
   const handleCvv = (event:any) => {
     let data = event.target.value;
+    setPaymentFailed(
+      {
+        error: false,
+        errorDetail: ''
+      }
+    );
+
     if(data === ''){
       setCvv({
         value: data,
@@ -194,6 +187,13 @@ export const Checkout: React.FC<CheckoutProps> = ({
   };
   const handleExpirationDate = (event:any) => {
     let data = event.target.value;
+    setPaymentFailed(
+      {
+        error: false,
+        errorDetail: ''
+      }
+    );
+
     if(data === ''){
       setExpirationDate({
         value: data,
@@ -210,7 +210,7 @@ export const Checkout: React.FC<CheckoutProps> = ({
       return;
     }
 
-    if (validDate(data) == false) {
+    if (validDate(data) === false) {
       return;
     }
     
@@ -220,7 +220,7 @@ export const Checkout: React.FC<CheckoutProps> = ({
       errorDetail: ''});
   };
 
-  const validDate = (date:any) => {
+  const validDate = (date:string) => {
     let arr = date.split('/')
     let month = parseInt(arr[0]);
     let year = parseInt("20"+arr[1]);
@@ -248,17 +248,136 @@ export const Checkout: React.FC<CheckoutProps> = ({
     return true;
   }
 
-  const validInputs = () => {
-    if(nameAdress.error == true
-      || adress.error == true
-      || cardNumber.error == true
-      || nameCreditCard.error == true
-      || cvv.error == true
-      || expirationDate.error == true){
-        return;
+  const validInputs = async(event:any) => {
+    event.preventDefault();
+    setLoading(true);
+    await logout();
+
+    try{
+      if(nameAdress.error === true
+        || adress.error === true
+        || cardNumber.error === true
+        || nameCreditCard.error === true
+        || cvv.error === true
+        || expirationDate.error === true){
+          if(nameAdress.error && nameAdress.value === ""){
+            setNameAdress({
+              value: nameAdress.value,
+              error: true,
+              errorDetail: 'Name cannot be empty!'});
+          }
+          if(adress.error && adress.value === ""){
+            setAdress({
+              value: adress.value,
+              error: true,
+              errorDetail: 'Adress cannot be empty!'});
+          }
+          if(cardNumber.error && cardNumber.value === ""){
+            setCardNumber({
+              value: cardNumber.value,
+              error: true,
+              errorDetail: 'Card number cannot be empty!'});
+          }
+          if(nameCreditCard.error && nameCreditCard.value === ""){
+            setNameCreditCard({
+              value: nameCreditCard.value,
+              error: true,
+              errorDetail: 'The name of the credit card holder cannot be empty!'});
+          }
+          if(cvv.error && cvv.value === ""){
+            setCvv({
+              value: cvv.value,
+              error: true,
+              errorDetail: 'CVV cannot be empty!'});
+          }
+          if(expirationDate.error && expirationDate.value === ""){
+            setExpirationDate({
+              value: expirationDate.value,
+              error: true,
+              errorDetail: 'Expiration date cannot be empty!'});
+          }
+          setLoading(false);
+          return;
+      }
+
+      setPaymentFailed(
+        {
+          error: false,
+          errorDetail: ''
+        }
+      );
+
+      const response = await axios.post(
+        url_payment+'pay',
+        {
+          cc: cardNumber.value,
+          holder: nameCreditCard.value,
+          cvv: cvv.value,
+          exp: expirationDate.value,
+          charge: "66",
+          username: localStorage.getItem('username'),
+          address: adress.value,
+          totalPrice: 66
+        },
+        { withCredentials: true }
+      );
+
+      if(response.status === 200){
+        setLoading(false);
+        changePage(Pages.ThankYou);
+      }
+
+    } catch(error:any){
+      setPaymentFailed(
+        {
+          error: true,
+          errorDetail: error.response.data.error
+        }
+      )
+      setLoading(false);  
     }
-    return changePage(Pages.ThankYou);
+
+    setLoading(false);
   }
+
+  const fetchData = async() => {
+    setLoading(true);
+    await logout();
+
+    setPaymentFailed(
+      {
+        error: false,
+        errorDetail: ''
+      }
+    );
+
+    try{
+      const response = await axios.get(
+        url_cart+localStorage.getItem('username'),
+        { withCredentials: true }
+      );
+
+      if(response.status === 200){
+        await setProducts(response.data);
+
+        let sum = 0;
+        response.data.map((product:any)=>{
+          sum += (product['price'])*(product['quantity']);
+        })
+        setTotalPrice(sum);
+      }
+    } catch{
+      setLoading(false);
+      changePage(Pages.ErrorLoading)
+    }
+
+    setLoading(false);
+  }
+
+
+  useEffect(() => {
+    fetchData();
+  }, []);
 
     return (
         <div className="root">
@@ -271,6 +390,22 @@ export const Checkout: React.FC<CheckoutProps> = ({
           <button className='btn back-button' onClick={() => changePage(Pages.Cart)}>
               ← Go Back
           </button>
+
+          
+          {
+        loading?
+        <div className='margin-top-container'>
+          <Loading /> 
+        </div>
+            :
+        <div>
+
+
+          { paymentFailed.error?
+            <div className='error center'> {paymentFailed.errorDetail} </div>
+              :
+            <></>
+          }
 
           <div>
             <div className='split-screen'>
@@ -378,20 +513,25 @@ export const Checkout: React.FC<CheckoutProps> = ({
                   <div className="checkout-form-content">
 
                     <div className="form-group mt-3">
-                      {cart &&
-                        cart.map((product) => (
-                          <div className="checkout-text" key={product._id}>
-                              <span>{product.name}</span>
+                      {products &&
+                        products.map((product) => (
+                          <div className="checkout-text" key={product['id']}>
+                              <span>{product['name']}</span>
                               <span> X </span>
-                              <span>{product.quantity}</span>
+                              <span>{product['quantity']}</span>
                               <span> = </span>
-                              <span>{(product.quantity) * (product.price)}</span>
+                              <span className='pink'>{(product['quantity']) * (product['price'])}</span>
                           </div>
                         ))}
                     </div>
+                    
+                    <div>
+                      <h4 className='center'>Total price</h4>
+                      <h4 className='pink center'>{totalPrice}</h4>
+                    </div>
 
                     <div className="d-grid gap-2 mt-3">
-                      <button className="btn pay-button" onClick={()=>validInputs()}>
+                      <button className="btn pay-button" onClick={(event)=>validInputs(event)}>
                         Pay
                       </button>
                     </div>
@@ -404,6 +544,11 @@ export const Checkout: React.FC<CheckoutProps> = ({
             </div>
 
           </div>
+
+          </div>
+      }
+
+
         </div>
     );
 }

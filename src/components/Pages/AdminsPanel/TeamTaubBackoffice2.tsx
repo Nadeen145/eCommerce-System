@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import './AdminsPanel.css';
 import { Header } from '../../AppHeader/Header';
-import { PageLayout } from '../PageLayout';
 import { pages, Pages } from '../../../Constants';
 import { BackofficeNavbar } from './BackofficeNavebar';
 import axios from 'axios';
 import { Loading } from '../../Common/Loading';
 
-let url_product = `http://localhost:3001/products/`;
+// let url_product = `http://localhost:3001/products/`;
+let url_product = `https://gatewayserver.onrender.com/products/`;
+let url_user = `https://gatewayserver.onrender.com/users/`;
 
 export interface TeamTaubBackoffice2Props {
   changePage(newPage: Pages): void,
@@ -17,8 +18,13 @@ export const TeamTaubBackoffice2: React.FC<TeamTaubBackoffice2Props> = ({
   changePage,  
 }) => {  
 
-    const [loading, setLoading] = useState(false);
-    const [buttonText, setButtonText] = useState('Add Product!');
+    let categories = ['t-shirt', 'hoodie', 'hat', 
+                      'necklace', 'bracelet', 'shoes',
+                      'pillow', 'mug', 'book',
+                      'puzzle', 'cards'];
+
+    const [loading, setLoading] = useState<boolean>(false);
+    const [buttonText, setButtonText] = useState<string>('Add Product!');
 
     const [name, setName] = useState({value:'', error:true, errorDetail:''});
     const [category, setCategory] = useState({value:'', error:true, errorDetail:''});
@@ -27,6 +33,35 @@ export const TeamTaubBackoffice2: React.FC<TeamTaubBackoffice2Props> = ({
     const [stock, setStock] = useState({value:'', error:true, errorDetail:''});
     const [imgUrl, setImgUrl] = useState({value:'', error:false, errorDetail:''});
   
+    const logout = async() => {
+      setLoading(true);
+      try{
+          const response1 = await axios.get(
+            url_user+"permission/"+ localStorage.getItem("username"), { withCredentials: true }
+          );
+      
+          if(response1.status === 200){
+              if(response1.data['permission'] === localStorage.getItem("permission")){
+                return;
+              }
+          }
+  
+          const response2 = await axios.post(
+            url_user+"logout", {}, { withCredentials: true }
+          );
+      
+          if(response2.status === 200){
+              localStorage.clear();
+              setLoading(false);
+              changePage(Pages.Login);
+          }
+      }
+      catch(error){
+  
+      }
+      setLoading(false);
+    }
+
     const handleName = (event:any) => {
       let data = event.target.value;
       if(data === ''){
@@ -50,6 +85,21 @@ export const TeamTaubBackoffice2: React.FC<TeamTaubBackoffice2Props> = ({
             value: data,
             error: true,
             errorDetail: 'Category cannot be empty!'});
+            return;
+        }
+
+        let flag = false; 
+        categories.map((temp) => {
+          if(temp === data){
+            flag = true;
+          }
+        })
+
+        if(flag === false){
+          setCategory({
+            value: data,
+            error: true,
+            errorDetail: 'Invalid Category!'});
             return;
         }
     
@@ -125,11 +175,11 @@ export const TeamTaubBackoffice2: React.FC<TeamTaubBackoffice2Props> = ({
             return;
         }
 
-        if (parseInt(data) <= 0) {
+        if (parseInt(data) < 0) {
             setStock({
               value: data,
               error: true,
-              errorDetail: 'Stock cannot be smaller or qual to zero!'});
+              errorDetail: 'Stock cannot be smaller than zero!'});
             return;
         }
           
@@ -156,12 +206,12 @@ export const TeamTaubBackoffice2: React.FC<TeamTaubBackoffice2Props> = ({
       };
 
     const validInputs = () => {
-        if(name.error == true
-          || category.error == true
-          || description.error == true
-          || price.error == true
-          || stock.error == true
-          || imgUrl.error == true){
+        if(name.error === true
+          || category.error === true
+          || description.error === true
+          || price.error === true
+          || stock.error === true
+          || imgUrl.error === true){
 
             if(name.error && name.value === ""){
               setName({
@@ -206,6 +256,9 @@ export const TeamTaubBackoffice2: React.FC<TeamTaubBackoffice2Props> = ({
       }
 
       const addProduct = async() => {
+        setLoading(true);
+        await logout();
+
         try{
           const response = await axios.post(
             url_product,
@@ -220,7 +273,7 @@ export const TeamTaubBackoffice2: React.FC<TeamTaubBackoffice2Props> = ({
             { withCredentials: true }
           );
 
-          localStorage.clear();
+          localStorage.setItem("product", "");
           if(response.status === 200){
             setLoading(false);
           }
@@ -248,13 +301,11 @@ export const TeamTaubBackoffice2: React.FC<TeamTaubBackoffice2Props> = ({
             { withCredentials: true }
           );
 
-          localStorage.clear();
+          localStorage.setItem("product", "");
 
           if(response.status === 200){
-            setLoading(false);
           }
         } catch{
-          setLoading(false);
         }
         setLoading(false);
         changePage(Pages.TeamTaubBackoffice1);
@@ -262,6 +313,7 @@ export const TeamTaubBackoffice2: React.FC<TeamTaubBackoffice2Props> = ({
 
       const fetchData = async() => {
         setLoading(true);
+        await logout();
 
         if(localStorage.getItem('product') === ''){
           setLoading(false);
@@ -283,13 +335,13 @@ export const TeamTaubBackoffice2: React.FC<TeamTaubBackoffice2Props> = ({
             setPrice({value: data['price'], error:false, errorDetail:''})
             setStock({value: data['stock'], error:false, errorDetail:''})
             setImgUrl({value: data['image']? data['image']:'', error:false, errorDetail:''})
-
-            setLoading(false);
           }
         } catch{
           setLoading(false);
           changePage(Pages.ErrorLoading)
         }
+        
+        setLoading(false);
       }
   
       useEffect(() => {
@@ -303,7 +355,7 @@ export const TeamTaubBackoffice2: React.FC<TeamTaubBackoffice2Props> = ({
                 title={pages[Pages.TeamTaubBackoffice1]}
             />
   
-            <BackofficeNavbar changePage={changePage} isProductsButton={true} />
+            <BackofficeNavbar changePage={changePage} page={0} />
 
             <div className='update-new-text center'>
                 <span>New Product | Update Product</span>
