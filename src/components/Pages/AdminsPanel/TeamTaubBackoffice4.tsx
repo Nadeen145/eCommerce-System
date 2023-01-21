@@ -10,7 +10,7 @@ import ReactPaginate from 'react-paginate';
 // let url_user = `http://localhost:3001/users/`;
 let url_user = `https://gatewayserver.onrender.com/users/`;
 
-let usersPerPage = 8;
+let usersPerPage = 4;
 
 export interface TeamTaubBackoffice4Props {
   changePage(newPage: Pages): void,
@@ -21,16 +21,17 @@ export const TeamTaubBackoffice4: React.FC<TeamTaubBackoffice4Props> = ({
 }) => {  
 
   const [loading, setLoading] = useState<boolean>(false);
+  const [subLoading, setSubLoading] = useState<boolean>(false);
   const [users, setUsers] = useState<any[]>([]);
-  const [currentPage, setCurrentPage] = React.useState<number>(0);
   const [usersLength, setUsersLength] = useState<number>(0);
 
-  const handlePageClick = async(data: { selected: number }) => {
-    setLoading(true);
+  const handlePageClick = async(data:any) => {
+    let selected_page = data.selected + 1;
+    setSubLoading(true);
 
     try{
       const response = await axios.get(
-        url_user+"page/"+usersPerPage+"/"+data.selected,
+        url_user+"page/"+usersPerPage+"/"+selected_page,
         { withCredentials: true }
       );
 
@@ -43,8 +44,7 @@ export const TeamTaubBackoffice4: React.FC<TeamTaubBackoffice4Props> = ({
       changePage(Pages.ErrorLoading)
     }
 
-    setCurrentPage(data.selected);
-    setLoading(false);
+    setSubLoading(false);
   }
 
   const getPermission = (permission:string) => {
@@ -138,58 +138,66 @@ export const TeamTaubBackoffice4: React.FC<TeamTaubBackoffice4Props> = ({
           </div>
                   :
           <div>
-            <div className='products-list-container'>
-              {
-              
-              users.length === 0 ? (
-                <div className="center">
-                  <h2 className='center'>There are no orders!</h2>
-                </div>
-              ) : 
-              
-              users &&
-                users.map((user) => (
-                  <div key={user['id']} className="list-item-product split-screen">
 
-                      <div className='text-container side3 padding-two-sides'>
-                          <span>Username: {user['username']}</span>
-                          <br></br>
-                          <span>Permission: {getPermission(user['permission'])}</span>
-                      </div>
-
-                      <div className='side1'>
-                        {
-                          user['permission'] === "A"?
-                            <></>
-                            :
-                            <div>
-                              <button className='btn status-update-permission-button' 
-                                      onClick={()=> updatePermission(
-                                                    user['username'], user['permission'], "U")}>
-                                User
-                              </button>
-                              <br></br>
-                              <br></br>
-                              <button className='btn status-update-permission-button' 
-                                      onClick={()=> updatePermission(
-                                                    user['username'], user['permission'], "W")}>
-                                Workhouse
-                              </button>
-                              <br></br>
-                              <br></br>
-                              <button className='btn status-update-permission-button' 
-                                      onClick={()=> updatePermission(
-                                                    user['username'], user['permission'], "M")}>
-                                Manager
-                              </button>
-                            </div>
-                        }
-
-                      </div>
-
+            { subLoading?
+              <div className='margin-top-down-container'>
+                <Loading /> 
+              </div>
+              :
+              <div className='products-list-container'>
+                {
+                
+                users.length === 0 ? (
+                  <div className="center">
+                    <h2 className='center'>There are no orders!</h2>
                   </div>
-                ))}
-            </div>
+                ) : 
+                
+                users &&
+                  users.map((user) => (
+                    <div key={user['username']} className="list-item-product split-screen">
+
+                        <div className='text-container side3 padding-two-sides'>
+                            <span>Username: {user['username']}</span>
+                            <br></br>
+                            <span>Permission: {getPermission(user['permission'])}</span>
+                        </div>
+
+                        <div className='side1'>
+                          {
+                            user['permission'] === "A"?
+                              <></>
+                              :
+                              <div>
+                                <button className='btn status-update-permission-button' 
+                                        onClick={()=> updatePermission(
+                                                      user['username'], user['permission'], "U")}>
+                                  User
+                                </button>
+                                <br></br>
+                                <br></br>
+                                <button className='btn status-update-permission-button' 
+                                        onClick={()=> updatePermission(
+                                                      user['username'], user['permission'], "W")}>
+                                  Workhouse
+                                </button>
+                                <br></br>
+                                <br></br>
+                                <button className='btn status-update-permission-button' 
+                                        onClick={()=> updatePermission(
+                                                      user['username'], user['permission'], "M")}>
+                                  Manager
+                                </button>
+                              </div>
+                          }
+
+                        </div>
+
+                    </div>
+                  ))}
+              </div>
+            }
+
 
             <div className='center'>
             <ReactPaginate className='center'
@@ -198,13 +206,17 @@ export const TeamTaubBackoffice4: React.FC<TeamTaubBackoffice4Props> = ({
               breakLabel = "..."
               pageCount={Math.ceil(usersLength / usersPerPage)}
               marginPagesDisplayed={2}
-              pageRangeDisplayed={5}
+              pageRangeDisplayed = {5}
               onPageChange={handlePageClick}
-              breakClassName = 'btn pagenation-button'
-              activeClassName = 'btn pagenation-active-button' 
-              pageClassName = 'btn pagenation-button' 
-              previousClassName = 'btn pagenation-sign-button' 
-              nextClassName = 'btn pagenation-sign-button' 
+              breakClassName = {'btn pagenation-button'}
+              activeClassName = {'btn pagenation-active-button'}
+              pageClassName = {'btn pagenation-button'}
+              previousClassName = {'btn pagenation-sign-button'}
+              nextLinkClassName = {'sign-text'}
+              previousLinkClassName = {'sign-text'}
+              nextClassName = {'btn pagenation-sign-button'}
+              disabledClassName = {'btn pagenation-disabled-button'}
+              disabledLinkClassName = {'disabled-text'}
             />
           </div>
 

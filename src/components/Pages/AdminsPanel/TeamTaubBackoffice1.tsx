@@ -11,7 +11,7 @@ import ReactPaginate from 'react-paginate';
 let url_product = `https://gatewayserver.onrender.com/products/`;
 let url_user = `https://gatewayserver.onrender.com/users/`;
 
-let productsPerPage = 8;
+let productsPerPage = 4;
 
 export interface TeamTaubBackoffice1Props {
   changePage(newPage: Pages): void,
@@ -22,8 +22,8 @@ export const TeamTaubBackoffice1: React.FC<TeamTaubBackoffice1Props> = ({
 }) => {  
 
   const [loading, setLoading] = useState<boolean>(false);
+  const [subLoading, setSubLoading] = useState<boolean>(false);
   const [products, setProducts] = useState<[]>([]);
-  const [currentPage, setCurrentPage] = React.useState<number>(0);
   const [productsLength, setProductsLength] = useState<number>(0);
 
   const logout = async() => {
@@ -55,13 +55,13 @@ export const TeamTaubBackoffice1: React.FC<TeamTaubBackoffice1Props> = ({
     setLoading(false);
   }
 
-  const handlePageClick = async(data: { selected: number }) => {
-    setLoading(true);
-    await logout();
+  const handlePageClick = async(data:any) => {
+    let selected_page = data.selected + 1;
+    setSubLoading(true);
 
     try{
       const response = await axios.get(
-        url_product+"page/"+productsPerPage+"/"+data.selected,
+        url_product+"page/withstock/"+productsPerPage+"/"+selected_page,
         { withCredentials: true }
       );
 
@@ -74,8 +74,7 @@ export const TeamTaubBackoffice1: React.FC<TeamTaubBackoffice1Props> = ({
       changePage(Pages.ErrorLoading)
     }
 
-    setCurrentPage(data.selected);
-    setLoading(false);
+    setSubLoading(false);
   }
 
     const updateProduct = async(id:any) => {
@@ -114,7 +113,7 @@ export const TeamTaubBackoffice1: React.FC<TeamTaubBackoffice1Props> = ({
 
       try{
         const response = await axios.get(
-          url_product+"page/"+productsPerPage+"/1",
+          url_product+"page/withstock/"+productsPerPage+"/1",
           { withCredentials: true }
         );
   
@@ -150,6 +149,13 @@ export const TeamTaubBackoffice1: React.FC<TeamTaubBackoffice1Props> = ({
             :
     <div>
 
+{ subLoading?
+              <div className='margin-top-down-container'>
+                <Loading /> 
+              </div>
+              :
+              <div>
+
       { localStorage.getItem("permission") === "A" || localStorage.getItem("permission") === "M"?
         <button className='btn new-button' onClick={() => updateProduct('')}>
             + New Product
@@ -166,7 +172,7 @@ export const TeamTaubBackoffice1: React.FC<TeamTaubBackoffice1Props> = ({
                 <h2 className='center'>There are no products!</h2>
               </div>
             ) : 
-            
+
             products &&
               products.map((product) => (
                 <div key={product['id']} className="list-item-product split-screen">
@@ -207,24 +213,39 @@ export const TeamTaubBackoffice1: React.FC<TeamTaubBackoffice1Props> = ({
 
                 </div>
               ))}
+
+
         </div>
 
-        <div className='center'>
-          <ReactPaginate className='center'
-            previousLabel= "<"
-            nextLabel = ">"
-            breakLabel = "..."
-            pageCount={Math.ceil(productsLength / productsPerPage)}
-            marginPagesDisplayed={2}
-            pageRangeDisplayed={5}
-            onPageChange={handlePageClick}
-            breakClassName = 'btn pagenation-button'
-            activeClassName = 'btn pagenation-active-button' 
-            pageClassName = 'btn pagenation-button' 
-            previousClassName = 'btn pagenation-sign-button' 
-            nextClassName = 'btn pagenation-sign-button' 
-          />
-        </div>
+</div>
+}
+
+
+
+        { products && products.length > 0? 
+                <div className='center'>
+                <ReactPaginate className='center'
+                  previousLabel= "<"
+                  nextLabel = ">"
+                  breakLabel = "..."
+                  pageCount={Math.ceil(productsLength / productsPerPage)}
+                  marginPagesDisplayed={2}
+                  pageRangeDisplayed = {5}
+                  onPageChange={handlePageClick}
+                  breakClassName = {'btn pagenation-button'}
+                  activeClassName = {'btn pagenation-active-button'}
+                  pageClassName = {'btn pagenation-button'}
+                  previousClassName = {'btn pagenation-sign-button'}
+                  nextLinkClassName = {'sign-text'}
+                  previousLinkClassName = {'sign-text'}
+                  nextClassName = {'btn pagenation-sign-button'}
+                  disabledClassName = {'btn pagenation-disabled-button'}
+                  disabledLinkClassName = {'disabled-text'}
+                />
+              </div>
+                :
+                <></>
+            }
 
     </div>
 }

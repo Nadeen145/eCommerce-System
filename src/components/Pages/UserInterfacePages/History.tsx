@@ -86,6 +86,9 @@ export const History: React.FC<HistoryProps> = ({
         <br></br>
         <div className="center">
           <h2 className='center'>{localStorage.getItem('username')}</h2>
+          <button className='btn back-button' onClick={() => changePage(Pages.Catalog)}>
+            ← Go Back
+          </button>
         </div>
         <br></br>
       </div>
@@ -151,6 +154,13 @@ export const History: React.FC<HistoryProps> = ({
                       </div>
 
                       <div className='side1'>
+                          <div>Status: </div>
+                            <div className='center like-button'>
+                              {order['status']}
+                            </div>
+
+                          <br></br>
+
                           <div>Total price: </div>
                           <div className='center like-button'>
                             <span></span>

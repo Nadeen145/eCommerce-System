@@ -11,7 +11,7 @@ import ReactPaginate from 'react-paginate';
 let url_order = `https://gatewayserver.onrender.com/orders/`;
 let url_user = `https://gatewayserver.onrender.com/users/`;
 
-let ordersPerPage = 8;
+let ordersPerPage = 4;
 
 export interface TeamTaubBackoffice3Props {
   changePage(newPage: Pages): void,
@@ -22,9 +22,9 @@ export const TeamTaubBackoffice3: React.FC<TeamTaubBackoffice3Props> = ({
 }) => {  
 
   const [loading, setLoading] = useState<boolean>(false);
+  const [subLoading, setSubLoading] = useState<boolean>(false);
   const [orders, setOrders] = useState<any[]>([]);
-  const [currentPage, setCurrentPage] = React.useState<number>(0);
-  const [ordersLength, setOrdersLength] = useState<number>(0);
+  const [ordersLength, setOrdersLength] = useState<number>(1);
 
   const logout = async() => {
     setLoading(true);
@@ -55,13 +55,13 @@ export const TeamTaubBackoffice3: React.FC<TeamTaubBackoffice3Props> = ({
     setLoading(false);
   }
 
-  const handlePageClick = async(data: { selected: number }) => {
-    setLoading(true);
-    await logout();
+  const handlePageClick = async(data:any) => {
+    let selected_page = data.selected + 1;
+    setSubLoading(true);
 
     try{
       const response = await axios.get(
-        url_order+"page/"+ordersPerPage+"/"+data.selected,
+        url_order+"page/"+ordersPerPage+"/"+selected_page,
         { withCredentials: true }
       );
 
@@ -74,8 +74,7 @@ export const TeamTaubBackoffice3: React.FC<TeamTaubBackoffice3Props> = ({
       changePage(Pages.ErrorLoading)
     }
 
-    setCurrentPage(data.selected);
-    setLoading(false);
+    setSubLoading(false);
   }
 
   const changeSatus = async(event:any, id:any) => {
@@ -152,6 +151,12 @@ export const TeamTaubBackoffice3: React.FC<TeamTaubBackoffice3Props> = ({
           </div>
                   :
           <div>
+            
+            { subLoading?
+              <div className='margin-top-down-container'>
+                <Loading /> 
+              </div>
+              :
             <div className='products-list-container'>
               {
               
@@ -194,24 +199,29 @@ export const TeamTaubBackoffice3: React.FC<TeamTaubBackoffice3Props> = ({
                   </div>
                 ))}
             </div>
-
+            }
+            
             { orders && orders.length > 0? 
                 <div className='center'>
-                  <ReactPaginate className='center'
-                    previousLabel= "<"
-                    nextLabel = ">"
-                    breakLabel = "..."
-                    pageCount={Math.ceil(ordersLength / ordersPerPage)}
-                    marginPagesDisplayed={2}
-                    pageRangeDisplayed={5}
-                    onPageChange={handlePageClick}
-                    breakClassName = 'btn pagenation-button'
-                    activeClassName = 'btn pagenation-active-button' 
-                    pageClassName = 'btn pagenation-button' 
-                    previousClassName = 'btn pagenation-sign-button' 
-                    nextClassName = 'btn pagenation-sign-button' 
-                  />
-                </div>
+                <ReactPaginate className='center'
+                  previousLabel= "<"
+                  nextLabel = ">"
+                  breakLabel = "..."
+                  pageCount={Math.ceil(ordersLength / ordersPerPage)}
+                  marginPagesDisplayed={2}
+                  pageRangeDisplayed = {5}
+                  onPageChange={handlePageClick}
+                  breakClassName = {'btn pagenation-button'}
+                  activeClassName = {'btn pagenation-active-button'}
+                  pageClassName = {'btn pagenation-button'}
+                  previousClassName = {'btn pagenation-sign-button'}
+                  nextLinkClassName = {'sign-text'}
+                  previousLinkClassName = {'sign-text'}
+                  nextClassName = {'btn pagenation-sign-button'}
+                  disabledClassName = {'btn pagenation-disabled-button'}
+                  disabledLinkClassName = {'disabled-text'}
+                />
+              </div>
                 :
                 <></>
             }
